@@ -6,7 +6,7 @@
 #include "List.h"
 
 List *List_new() {
-    List *ll = malloc(sizeof(List));
+    List *ll = malloc(sizeof(*ll));
     ll->head = NULL;
     ll->item_count = 0;
     return ll;
@@ -19,7 +19,7 @@ void List_push(List *self, void *item) {
         last_item_ptr = last_item_ptr->next_ptr;
     }
 
-    ListItem *new_item = malloc(sizeof(ListItem));
+    ListItem *new_item = malloc(sizeof(*new_item));
     new_item->next_ptr = NULL;
     new_item->last_ptr = NULL;
     new_item->item_data = item;

@@ -16,7 +16,7 @@ struct DString
 
 DString* DString_new()
 {
-    DString* new_ptr = malloc(sizeof(new_ptr));
+    DString* new_ptr = malloc(sizeof(*new_ptr));
     new_ptr->capacity = 0;
     new_ptr->data = NULL;
 
@@ -27,7 +27,8 @@ DString* DString_from_CString(char* str)
 {
     DString* ds = DString_new();
     ds->capacity = strlen(str);
-    ds->data = malloc(sizeof(char) * (ds->capacity+1));
+    ds->data = calloc(ds->capacity+1,sizeof(char));
+    strcpy(ds->data,str);
     assert(ds->data && "DString couldn't alloc");
 
     return ds;
