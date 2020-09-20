@@ -47,7 +47,7 @@ void *List_get(const List *self, int index) {
     return at_item_ptr->item_data;
 }
 
-void List_free(List *self) {
+void List_free(List *self, ) {
     if (self->item_count == 0)
         return;
 

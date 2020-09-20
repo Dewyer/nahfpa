@@ -11,33 +11,48 @@
 
 struct ExpParser
 {
-    DString* raw_txt;
+	DString *raw_txt;
+	List *tokens;
 };
 
-ExpParser* ExpParser_new(DString* raw_txt)
+ExpParser *ExpParser_new(DString *raw_txt)
 {
-    ExpParser* exp = malloc(sizeof(exp));
-    exp->raw_txt = raw_txt;
-    return exp;
+	ExpParser *exp = malloc(sizeof(exp));
+	exp->raw_txt = raw_txt;
+	return exp;
 }
 
-void ExpParser_parse(ExpParser* self)
+
+void ExpParser_do_parse(ExpParser *self)
+{
+	printf("STEP 2. : Parse\n");
+
+	printf("STEP 2. Parsing FINISHED!\n");
+}
+
+void ExpParser_tokenize(ExpParser *self)
 {
 	printf("STEP 1. : Tokenizer\n");
-	ExpTokenizer* tokenizer = ExpTokenizer_new(self->raw_txt);
-	List* tokens = ExpTokenizer_tokenize(tokenizer);
+	ExpTokenizer *tokenizer = ExpTokenizer_new(self->raw_txt);
+	List *tokens = ExpTokenizer_tokenize(tokenizer);
 	printf("== Tokenization successfull\n");
-	for (int ii = 0 ; ii < tokens->item_count; ii++)
-	{
-		DString* item = List_get(tokens,ii);
-		printf("token:'%s'\n",DString_to_CString(item));
+	for (int ii = 0; ii < tokens->item_count; ii++) {
+		DString *item = List_get(tokens, ii);
+		printf("token:'%s'\n", DString_to_CString(item));
 	}
-	printf("STEP 1. Tokenization OVER!\n");
-	
+	printf("STEP 1. Tokenization FINISHED!\n");
+	self->tokens = tokens;
 }
 
-void ExpParser_free(ExpParser* self)
+void ExpParser_parse(ExpParser *self)
 {
-    DString_free(self->raw_txt);
-    free(self);
+	ExpParser_tokenize(self);
+	ExpParser_do_parse(self);
+}
+
+
+void ExpParser_free(ExpParser *self)
+{
+	DString_free(self->raw_txt);
+	free(self);
 }
