@@ -38,6 +38,20 @@ char* DString_to_CString(DString* self)
 {
     return self->data;
 }
+
+int DString_len(const DString* self)
+{
+	return (int)strlen(self->data);
+}
+
+void DString_add_char(DString* self, char chr)
+{
+	char* new_ptr = calloc(self->capacity + 2,sizeof(*new_ptr));
+	strcpy(new_ptr,self->data);
+	char temp[2] = {chr,'\0'};
+	strcat(self->data,temp);
+}
+
 void DString_free(DString* self)
 {
     free(self->data);

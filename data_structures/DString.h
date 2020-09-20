@@ -10,6 +10,9 @@ typedef struct DString DString;
 DString* DString_new();
 DString* DString_from_CString(char* str);
 char* DString_to_CString(DString* self);
+int DString_len(const DString* self);
+void DString_add_char(DString* self, char chr);
+
 void DString_free(DString* self);
 
 #endif //NAHFPA_DSTRING_H
