@@ -1,26 +1,25 @@
 ### NAHFPA
 
 - Nagy házi feladat - the parser
-- Md és latex subset parsolása html be ill. svg be
+- Latex nyelvtanához hasonnló matematikai leíró nyelv fordító !
+- Latex szerű forráskód -> svg kép ami az emeletes és egyébb csodás matematikai kifejezést kirajzolja
 
-#### Latex Subset
-- Legfőbb matematikai operátorok:
-    - Szorzás
-    - Osztás (Törtvonallal és inline)
-    - Összeadás / Kivonás
-    - Betük számok
-    - Emeletes hatványozás
-    - Gyökjel
-    - Szumma / Sor szorzat jel, indexekkel meg minden
-    - Integrál jel
+#### Mit fog tudni ?
+- Szorzás
+- Osztás (Törtvonallal és inline)
+- Összeadás / Kivonás
+- Betük számok
+- Emeletes hatványozás
+- Gyökjel
+- Szumma / Sor szorzat jel, indexekkel meg minden
+- Integrál jel
+- többi **TBD**
+- **CLI**
+    - Lesz hozzá egy CLI
+    - Logging opciókkal (Verbozitás, fileba írás)
+    - Színek átírhatók lesznek (fekete fehér helyett vmi más)
+    - Kimeneti és bemeneti fileok megadása
 
-- Latex parsing
-    - Exp parsing: 
-        - node, has a list of inner expressions, and ptr to parent
-        - 
-
-#### Markdown
-- Nagyrészt compliant with: https://spec.commonmark.org/0.29/
-- Képek egyenlőre nincsenek
-- $$ inline latex
-- $ centered latex
+#### Mit nem fog valószínűleg tudni ?
+- Sortörés
+- többi **TBD**
