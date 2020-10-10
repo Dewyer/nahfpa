@@ -1,0 +1,70 @@
+%! suppress = Unicode
+\documentclass{article}[12pt,a4paper]
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{csquotes}
+
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+filecolor=magenta,
+urlcolor=cyan,
+}
+
+\title{NAHFPA specifikáció}
+\author{Rátki Barnabás}
+\date{2020.10.xx}
+
+\newcommand{\lang}[1]{\textit{#1}}
+\newcommand{\tbs}{\textbackslash}
+
+\renewcommand*\contentsname{Tartalomjegyzék}
+
+\begin{document}
+    \maketitle
+
+    \tableofcontents
+
+    \section{Mi a program ?}\label{sec:mi-a-program-?}
+    A NAHFPA = \textbf{NA}gy \textbf{H}ázi\textbf{F}eladat egy \textbf{PA}rser, program célja, hogy egy a \LaTeX -hez hasonló nyelvtanú
+    nyelvben megírt matematikai kifejezést \textit{SVG} (Scalable Vector Graphics) formátummá fordítson.
+    A felhasználó a program működését egy parancssoros (CLI) interfészen keresztül tudja irányítani.
+    A következőkben először a leíró nyelv nyelvtanjáról lessz szó, utána pedig az interfész és egyébb támogató rendszerek működéséről.
+
+    \section{Leíró nyelv}\label{sec:leíró-nyelv}
+    ( A leíró nyelvet hívjuk az egyszerűség kedvéért, nahfpa-nak. )
+    A formátuma egy egyszerű UTF-8 kódolású szöveges fájl aminek akármilyen kiterjesztése lehet, preferált a \textit{.nah}, vagy a \textit{.math}.
+    Egy fájlban, vagy egységben, egy ábrát tudunk leírni, a nyelvnek nem célja a matematikai nyelvi helyességet ellenőrizni.
+    A nyelv kifejezéseket tartalmaz, amik balról jobbra olvasva jelennek meg a megjelenítésben, egy kifejezés magában foglalhat gyakran másik kifejezéseket,
+    a kifejezések leírása fog következni az ezen specifikációnak eleget tevő megjelenítési megkötésekkel és a kifejezések nyelvtani leírásával.
+    A fordító helytelen nyelvtannal megírt fileokat, hibától függően két fajta módon kezel: a hibát képességi szerint ignorálja vagy a fordítást hibával végződik, fordított file nem keletkezik.
+    ( A hibakezelés részletes leírása késöbb jön)
+
+    \subsection{Kifejezésekből álltalánosan}\label{subsec:kifejezésekből-álltalánosan}
+    A nyelvben vannak literálisok és parancsok.
+    A literálisok csak be kell írni, és átalakítva megjelennek.
+    A parancsok viszont a következő képpen épülnek fel: \lang{\tbs parancs\{paraméter1\}\{parméter2\}...} akárhány paraméterrel.
+    A következőkben a \lang{[kif]} helyére akármilyen nyelvtani kifejezés behelyettesíthető.\\
+    A \{ és \} jelekkel körül tudunk zárni kifejezéseket, hogy azok egy egymás mellé rakott kifejezésként viselkedjenek.
+    Pl: \lang{\{a + b + c\}} kifejezés is beírható minden \lang{[kif]} helyére.
+    Ez a nyelvtan hasonló lehet egy parancs parméterének megadására, de nem egyenértékűek, tehát például a: \lang{\tbs almaa} az nem az \lang{alma} parancs \lang{a} paraméterrel,
+    viszont a \lang{\tbs alma\{\{a + b\}\}} parancsban az \lang{\{a + b\}} kifejezés lista a paraméter.
+
+    \subsection{Szám literálok}\label{subsec:szám-literálok}
+    Akármilyen csak numerikus karaktersorozat, ami tartalmazhat tizedes pontot vagy vesszőt\\
+    Például: \lang{123456}, \lang{00120.232} mind úgy jelennek meg ahogy írjuk őket.
+    
+    \subsection{Szöveges literálok}\label{subsec:szöveges-literálok}
+
+
+    \subsection{Egyszerű operátorok}\label{subsec:két-operandusu-egyszerű-operátorok}
+    Pontosabban a \textit{+, -, *, /} jelek.
+    Ezek akárhogyan elhelyezhetők illetve operandusuk elhagyhatóak. \\
+    Például: \lang{[kif] + [kif]}, \lang{** [kif]} (két szorzás operátor egymás mellet aminél az elsőnek nincsen operandusa.) mind helyes kifejezések. \\
+    \textbf{Megjelnítési megkötés:} A körbevevő kifejezésektől távolságot kell tartania.
+
+    \subsection{}
+    
+\end{document}
