@@ -1,0 +1,30 @@
+%! suppress = Unicode
+\documentclass[../spec.tex]{subfiles}
+
+\begin{document}
+
+    A program egy parancssori interfészen keresztül használható.
+    Ennek a működése parancsorban megadott argomentumokkal és zászlókkal irányítható.\\
+    Példa a program használatára: \lang{nahfpa.exe -i input.math -o out.svg}\\
+
+    \subsection{Naplózási szintek}\label{subsec:napló-szintek}
+    A program működése közben naplózási adatokat ad ki, a standard kimenetre vagy a megadott naplózási fileba.
+    A naplózásnak több szintje van:
+    \begin{itemize}
+        \item Infó : Információs adatok
+        \item Warn : Figyelmeztetések
+        \item Error : Hibák
+    \end{itemize}
+    Az adott naplózási információ tartalmától függ, hogy melyik szintben lesz kiadva.
+    A felhasználó kimenetre küldött naplózást szűrheti, például: Csak figyelmeztetéseket vagy hibákat írjon ki a program.
+
+    \subsection{Parancssori argumentumok}\label{subsec:args}
+    \begin{itemize}
+        \item -i : Bemeneti fájl elérési útvonala | Standard bemenetről olvas be a program EOF jelig.
+        \item -o : Kimeneti fájl elérési útvonala | Alap érték: \lang{out.svg}
+        \item -l [szint] : A kimeneten megjelenő minimum naplózási szint beállítása, \lang{szint} lehetséges értékei: \lang{i, w, e} (Infó, Warning, Error) | Alap érték: Error
+        \item -lf [fájl] : A naplózái fájl elérési útvonala | Standard kimentre naplózik a program.
+    \end{itemize}
+    | jel után lévő részek azt tartalmazzák, hogy mi történik ha a felhasználó nem adja meg az adott argomentumot.
+
+\end{document}

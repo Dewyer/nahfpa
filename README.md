@@ -5,15 +5,15 @@
 - Latex szerű forráskód -> svg kép ami az emeletes és egyébb csodás matematikai kifejezést kirajzolja
 
 #### Mit fog tudni ?
-- Szorzás
-- Osztás (Törtvonallal és inline)
-- Összeadás / Kivonás
-- Betük számok
-- Emeletes hatványozás
-- Gyökjel
-- Szumma / Sor szorzat jel, indexekkel meg minden
-- Integrál jel
-- többi **TBD**
+- Szorzás p
+- Osztás (Törtvonallal és inline) p
+- Összeadás / Kivonás p
+- Betük számok p
+- Emeletes hatványozás p
+- Gyökjel p
+- Szumma / Sor szorzat jel, indexekkel meg minden p
+- Integrál jel  p
+- többi **TBD** p
 - **CLI**
     - Lesz hozzá egy CLI
     - Logging opciókkal (Verbozitás, fileba írás)
