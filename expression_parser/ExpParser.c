@@ -26,7 +26,7 @@ ExpParser *ExpParser_new(DString *raw_txt)
 void ExpParser_do_parse(ExpParser *self)
 {
 	printf("STEP 2. : Parse\n");
-
+	printf("%d", DString_len(self->raw_txt));
 	printf("STEP 2. Parsing FINISHED!\n");
 }
 
@@ -36,7 +36,7 @@ void ExpParser_tokenize(ExpParser *self)
 	ExpTokenizer *tokenizer = ExpTokenizer_new(self->raw_txt);
 	List *tokens = ExpTokenizer_tokenize(tokenizer);
 	printf("== Tokenization successfull\n");
-	for (int ii = 0; ii < tokens->item_count; ii++) {
+	for (int ii = 0; (size_t)ii < tokens->item_count; ii++) {
 		DString *item = List_get(tokens, ii);
 		printf("token:'%s'\n", DString_to_CString(item));
 	}

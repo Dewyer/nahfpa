@@ -18,7 +18,7 @@ typedef struct ListItem {
 
 List *List_new();
 void List_push(List *self, void *item);
-void *List_get(const List *self, int index);
+void *List_get(const List *self, size_t index);
 void List_free(List *self);
 
 #endif //UNTITLED_LINKEDLIST_H

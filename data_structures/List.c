@@ -15,7 +15,7 @@ List *List_new() {
 void List_push(List *self, void *item) {
     ListItem *last_item_ptr = self->head;
 
-    for (int ii = 1; ii < self->item_count; ii++) {
+    for (int ii = 1; (size_t)ii < self->item_count; ii++) {
         last_item_ptr = last_item_ptr->next_ptr;
     }
 
@@ -34,20 +34,20 @@ void List_push(List *self, void *item) {
     self->item_count ++;
 }
 
-void *List_get(const List *self, int index) {
+void *List_get(const List *self, size_t index) {
     if (index >= self->item_count) {
         return NULL;
     }
     ListItem *at_item_ptr = self->head;
 
-    for (int ii = 0; ii < index; ii++) {
+    for (size_t ii = 0; ii < index; ii++) {
         at_item_ptr = at_item_ptr->next_ptr;
     }
 
     return at_item_ptr->item_data;
 }
 
-void List_free(List *self, ) {
+void List_free(List *self ) {
     if (self->item_count == 0)
         return;
 
