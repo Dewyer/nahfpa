@@ -5,8 +5,8 @@
 #ifndef NAHFPA_EXPNODE_H
 #define NAHFPA_EXPNODE_H
 
-#include "../data_structures/DString.h"
-#include "../data_structures/List.h"
+#include "data_structures/DString.h"
+#include "data_structures/List.h"
 
 typedef enum ExpNodeType {
 	SuperScript,

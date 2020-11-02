@@ -11,5 +11,24 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
+SET(BASEPATH "${CMAKE_SOURCE_DIR}/src")
+INCLUDE_DIRECTORIES("${BASEPATH}")
 
-add_executable(nahfpa main.c data_structures/List.c data_structures/List.h expression_parser/ExpParser.c expression_parser/ExpParser.h data_structures/DString.c data_structures/DString.h expression_tokenizer/ExpTokenizer.c expression_tokenizer/ExpTokenizer.h expression_parser/ExpNode.c expression_parser/ExpNode.h data_structures/common.h)
+add_executable(nahfpa
+        src/main.c
+        src/data_structures/List.c
+        src/data_structures/List.h
+        src/expression_parser/ExpParser.c
+        src/expression_parser/ExpParser.h
+        src/data_structures/DString.c
+        src/data_structures/DString.h
+        src/expression_tokenizer/ExpTokenizer.c
+        src/expression_tokenizer/ExpTokenizer.h
+        src/expression_parser/ExpNode.c
+        src/expression_parser/ExpNode.h
+        src/data_structures/common.h
+        src/logger/logger.c
+        src/logger/logger.h
+        src/nahfpa_cli/NahfpaCli.c
+        src/nahfpa_cli/NahfpaCli.h
+        src/dbgalloc/m.h)

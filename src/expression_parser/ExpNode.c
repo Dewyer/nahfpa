@@ -4,10 +4,11 @@
 
 #include <stdlib.h>
 #include "ExpNode.h"
+#include "dbgalloc/m.h"
 
 ExpNode* ExpNode_new(ExpNodeType type)
 {
-	ExpNode* exp_node = malloc(sizeof(*exp_node));
+	ExpNode* exp_node = (ExpNode*) malloc(sizeof(*exp_node));
 	exp_node->node_list = NULL;
 	exp_node->arg1 = NULL;
 	exp_node->arg2 = NULL;

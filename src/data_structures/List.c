@@ -3,10 +3,11 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
+#include "dbgalloc/m.h"
 #include "List.h"
 
 List *List_new() {
-    List *ll = malloc(sizeof(*ll));
+    List *ll = (List*) malloc(sizeof(*ll));
     ll->head = NULL;
     ll->item_count = 0;
     return ll;
@@ -19,7 +20,7 @@ void List_push(List *self, void *item) {
         last_item_ptr = last_item_ptr->next_ptr;
     }
 
-    ListItem *new_item = malloc(sizeof(*new_item));
+    ListItem *new_item = (ListItem*) malloc(sizeof(*new_item));
     new_item->next_ptr = NULL;
     new_item->last_ptr = NULL;
     new_item->item_data = item;
@@ -47,15 +48,28 @@ void *List_get(const List *self, size_t index) {
     return at_item_ptr->item_data;
 }
 
-void List_free(List *self ) {
+void List_free_2D(List *self, void (*free_item)(void*)) {
     if (self->item_count == 0)
-        return;
+	{
+    	free(self);
+    	return;
+	}
 
     ListItem *ptr_i = self->head;
     while (ptr_i != NULL)
     {
         ListItem *saved_ptr = ptr_i;
         ptr_i = ptr_i->next_ptr;
-        free(saved_ptr);
+
+        if (free_item)
+			free_item(saved_ptr);
+        else
+        	free(saved_ptr);
     }
+	free(self);
+}
+
+void List_free(List *self)
+{
+	List_free_2D(self, NULL);
 }

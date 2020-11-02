@@ -3,10 +3,11 @@
 //
 
 #include <stdio.h>
-#include <stdlib.h>
-#include "DString.h"
 #include <string.h>
 #include <assert.h>
+#include "dbgalloc/m.h"
+#include <stdlib.h>
+#include "DString.h"
 
 struct DString
 {
@@ -16,7 +17,7 @@ struct DString
 
 DString* DString_new()
 {
-    DString* new_ptr = malloc(sizeof(*new_ptr));
+    DString* new_ptr = (DString*) malloc(sizeof(*new_ptr));
     new_ptr->capacity = 0;
     new_ptr->data = NULL;
 
@@ -27,7 +28,7 @@ DString* DString_from_CString(char* str)
 {
     DString* ds = DString_new();
     ds->capacity = strlen(str);
-    ds->data = calloc(ds->capacity+1,sizeof(char));
+    ds->data = (char*) calloc(ds->capacity+1,sizeof(char));
     strcpy(ds->data,str);
     assert(ds->data && "DString couldn't alloc");
 
@@ -46,10 +47,15 @@ int DString_len(const DString* self)
 
 void DString_add_char(DString* self, char chr)
 {
-	char* new_ptr = calloc(self->capacity + 2,sizeof(*new_ptr));
+	char* new_ptr = (char*) calloc(self->capacity + 2,sizeof(*new_ptr));
 	strcpy(new_ptr,self->data);
+
 	char temp[2] = {chr,'\0'};
-	strcat(self->data,temp);
+	strcat(new_ptr,temp);
+
+	free(self->data);
+	self->data = new_ptr;
+	self->capacity += 2;
 }
 
 void DString_free(DString* self)

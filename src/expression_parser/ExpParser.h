@@ -5,7 +5,7 @@
 #ifndef NAHFPA_EXPPARSER_H
 #define NAHFPA_EXPPARSER_H
 
-#include "../data_structures/DString.h"
+#include "data_structures/DString.h"
 
 typedef struct ExpParser ExpParser;
 ExpParser* ExpParser_new(DString* raw_txt);

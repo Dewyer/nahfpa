@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "ExpTokenizer.h"
-#include "../data_structures/List.h"
+#include "data_structures/common.h"
 
 struct ExpTokenizer
 {
@@ -14,7 +14,7 @@ struct ExpTokenizer
 
 ExpTokenizer *ExpTokenizer_new(DString *raw_txt)
 {
-	ExpTokenizer *exp = malloc(sizeof(exp));
+	ExpTokenizer *exp = (ExpTokenizer*) malloc(sizeof(exp));
 	exp->raw_txt = raw_txt;
 
 	return exp;
@@ -32,15 +32,19 @@ bool is_single_operator(char cc)
 		   || cc == '(' || cc == ')' || cc == '[' || cc == ']' || cc == '^';
 }
 
-void flush_tokenizer(List *tokens, DString *last_token_buffer)
+bool flush_tokenizer(List *tokens, DString *last_token_buffer)
 {
-	if (DString_len(last_token_buffer) > 0)
+	if (DString_len(last_token_buffer) > 0) {
 		List_push(tokens, last_token_buffer);
+		return true;
+	}
+
+	return false;
 }
 
-List *ExpTokenizer_tokenize(const ExpTokenizer *self)
+ListG(DString*) *ExpTokenizer_tokenize(const ExpTokenizer *self)
 {
-	List *tokens = List_new(); //<DString>
+	ListG(DString*) *tokens = List_new();
 	const int exp_len = DString_len(self->raw_txt);
 	const char *raw_cstring = DString_to_CString(self->raw_txt);
 	DString *last_token_buffer = DString_from_CString("");
@@ -74,7 +78,9 @@ List *ExpTokenizer_tokenize(const ExpTokenizer *self)
 		}
 	}
 
-	flush_tokenizer(tokens, last_token_buffer);
+	bool did_flush_last_token = flush_tokenizer(tokens, last_token_buffer);
+	if (!did_flush_last_token)
+		DString_free(last_token_buffer);
 
 	return tokens;
 }
