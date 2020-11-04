@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 #include <logger/logger.h>
+#include <stdbool.h>
 #include "NahfpaCli.h"
 #include "data_structures/DString.h"
 #include "expression_parser/ExpParser.h"
@@ -7,30 +9,120 @@
 struct NahfpaCli
 {
 	int arg_count;
-	char** args;
+	char **args;
 
-	Logger* logger;
+	char *input_file_path;
+	char *out_file_path;
+	char *log_file_path;
+	LogLevel min_log_level;
+
+	Logger *pre_logger;
+	Logger *logger;
 };
 
 NahfpaCli *NahfpaCli_new(int argc, char *argv[])
 {
-	NahfpaCli *self = (NahfpaCli *) malloc(sizeof(self));
+	NahfpaCli *self = (NahfpaCli *) malloc(sizeof(*self));
 	self->arg_count = argc;
 	self->args = argv;
 
-	self->logger = Logger_new(LogInfo, NULL);
+	self->min_log_level = LogInfo;
+	self->input_file_path = NULL;
+	self->out_file_path = NULL;
+	self->log_file_path = NULL;
+
+	self->logger = NULL;
+	self->pre_logger = Logger_new(LogInfo, NULL);
 
 	return self;
 }
 
-void NahfpaCli_compile(NahfpaCli* self)
+void NahfpaCli_parse_min_log_level_from_string(NahfpaCli *self, char *log_level_str)
 {
-	Logger_log(self->logger, LogInfo, "NAPFHA Compiling!");
-	Logger_log(self->logger, LogWarning, "NAPFHA warn!");
-	Logger_log(self->logger, LogError, "NAPFHA err! %d", 200);
+	const int levels_count = 3;
+	char *level_names[][2] = {
+			{"i", "info"},
+			{"w", "warning"},
+			{"e", "error"}
+	};
 
-	DString* latex = DString_from_CString("\\frac{x + 10}{20} = 42");
-	ExpParser* parser = ExpParser_new(latex);
+	if (log_level_str == NULL) {
+		self->min_log_level = LogInfo;
+		return;
+	}
+
+	for (int ii = 0; ii < levels_count; ++ii)
+		if (strcmp(log_level_str, level_names[ii][0]) == 0 || strcmp(log_level_str, level_names[ii][1]) == 0)
+			self->min_log_level = (LogLevel) ii;
+}
+
+void NahfpaCli_log_args(const NahfpaCli *self)
+{
+	Logger_log(self->pre_logger, LogInfo, "Supplied / Default CLI arguments:");
+	Logger_log(self->pre_logger, LogInfo, "\tInput file: %s", self->input_file_path ? self->input_file_path : "STDIN");
+	Logger_log(self->pre_logger, LogInfo, "\tOutput file path: %s", self->out_file_path);
+	Logger_log(self->pre_logger, LogInfo, "\tLog file: %s", self->log_file_path ? self->log_file_path : "STDOUT");
+	Logger_log(self->pre_logger, LogInfo, "\tMinimum log level: %s", LogLevel_to_string(self->min_log_level));
+}
+
+void NahfpaCli_construct_logger(NahfpaCli *self)
+{
+	if (self->log_file_path)
+	{
+
+	}
+}
+
+void NahfpaCli_parse_args(NahfpaCli *self)
+{
+	Logger_log(self->pre_logger, LogInfo, "Parsing CLI arguments.");
+
+	const int arg_type_count = 4;
+	const char *arg_names[][2] = {
+			{"-i",  "--input"},
+			{"-o",  "--out"},
+			{"-l",  "--log-level"},
+			{"-lf", "--log-file"}
+	};
+	char *log_level_str = NULL;
+	char **arg_ptrs[] = {&self->input_file_path, &self->out_file_path, &log_level_str, &self->log_file_path};
+
+	for (int arg_i = 1; arg_i < self->arg_count - 1; arg_i++) {
+		char *arg = self->args[arg_i];
+		bool found_name = false;
+
+		for (int arg_type_i = 0; arg_type_i < arg_type_count; ++arg_type_i)
+			if ((strcmp(arg, arg_names[arg_type_i][0]) == 0 || strcmp(arg, arg_names[arg_type_i][1]) == 0)) {
+				if (*(arg_ptrs[arg_type_i]) == NULL) {
+					*(arg_ptrs[arg_type_i]) = self->args[arg_i + 1];
+					found_name = true;
+					arg_i++; // To skip next arg
+				} else
+					Logger_log(self->pre_logger, LogWarning, "NAPFHA loaded...");
+			}
+
+		if (!found_name)
+			Logger_log(self->pre_logger, LogWarning, "Invalid command line argument: %s", arg);
+	}
+
+	if (self->out_file_path == NULL) // default out path
+		self->out_file_path = "out.svg";
+
+	NahfpaCli_parse_min_log_level_from_string(self, log_level_str);
+
+
+	NahfpaCli_log_args(self);
+}
+
+void NahfpaCli_compile(NahfpaCli *self)
+{
+	Logger_log(self->pre_logger, LogInfo, "NAPFHA - the MathTex like compiler");
+	NahfpaCli_parse_args(self);
+
+	Logger_log(self->pre_logger, LogError, "NAPFHA loaded...");
+
+	DString *latex = DString_from_CString("\\frac{x + 10}{20} = 42");
+	ExpParser *parser = ExpParser_new(latex);
 
 	ExpParser_parse(parser);
 
@@ -39,6 +131,9 @@ void NahfpaCli_compile(NahfpaCli* self)
 
 void NahfpaCli_free(NahfpaCli *self)
 {
-	Logger_free(self->logger);
+	if (self->logger)
+		Logger_free(self->logger);
+
+	Logger_free(self->pre_logger);
 	free(self);
 }

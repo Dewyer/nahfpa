@@ -31,4 +31,4 @@ add_executable(nahfpa
         src/logger/logger.h
         src/nahfpa_cli/NahfpaCli.c
         src/nahfpa_cli/NahfpaCli.h
-        src/dbgalloc/m.h)
+        src/dbgalloc/m.h src/utils/cassert.c src/utils/cassert.h)

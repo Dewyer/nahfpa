@@ -13,21 +13,24 @@ struct Logger
 {
 	LogLevel min_level;
 	FILE *out_file;
+	bool should_free_out_file;
 	bool use_color;
 };
 
-Logger *Logger_new(LogLevel min_level, FILE *out)
+Logger *Logger_new(LogLevel min_level,char *out_path)
 {
 	Logger *self = (Logger *) malloc(sizeof(*self));
 
 	self->min_level = min_level;
-	if (out) {
-		self->out_file = out;
+	if (out_path) {
+		self->out_file = fopen(out_path, "w");
 		self->use_color = false;
+		self->should_free_out_file = true;
 	}
 	else {
 		self->out_file = stdout;
 		self->use_color = true;
+		self->should_free_out_file = false;
 	}
 
 	return self;
@@ -41,23 +44,23 @@ void Logger_print_date(Logger *self)
 	fprintf(self->out_file,"%d-%02d-%02dT%02d:%02d:%02d.000Z", time_now->tm_year+1900, time_now->tm_mon, time_now->tm_mday, time_now->tm_hour, time_now->tm_min, time_now->tm_sec); //2020-11-02T22:37:12.736Z
 }
 
-void Logger_print_head(Logger* self, LogLevel level)
+char* LogLevel_to_string(const LogLevel level)
 {
-	char *level_name;
 	switch (level) {
 		case LogInfo:
-			level_name = "INFO";
-			break;
+			return "INFO";
 		case LogWarning:
-			level_name = "WARN";
-			break;
+			return "WARN";
 		case LogError:
-			level_name = "ERR";
-			break;
+			return "ERR";
 		default:
-			level_name = "OTHE";
-			break;
+			return "OTHE";
 	}
+}
+
+void Logger_print_head(Logger* self, LogLevel level)
+{
+	char *level_name = LogLevel_to_string(level);
 
 	if (self->use_color)
 	{
