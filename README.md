@@ -23,3 +23,11 @@
 #### Mit nem fog valószínűleg tudni ?
 - Sortörés
 - többi **TBD**
+
+Tervek:
+- Tokenizálás
+
+- Expression fa építés
+root az egy node list
+
+

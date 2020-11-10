@@ -1,10 +1,14 @@
-#include <stdlib.h>
 #include <string.h>
 #include <logger/logger.h>
 #include <stdbool.h>
+#include <utils/cassert.h>
+#include <utils/help_txt.h>
 #include "NahfpaCli.h"
 #include "data_structures/DString.h"
 #include "expression_parser/ExpParser.h"
+#include "debugmalloc.h"
+
+typedef enum CliMode {HelpMode, CompileMode} CliMode;
 
 struct NahfpaCli
 {
@@ -65,40 +69,38 @@ void NahfpaCli_log_args(const NahfpaCli *self)
 	Logger_log(self->pre_logger, LogInfo, "\tMinimum log level: %s", LogLevel_to_string(self->min_log_level));
 }
 
-void NahfpaCli_construct_logger(NahfpaCli *self)
-{
-	if (self->log_file_path)
-	{
-
-	}
-}
-
-void NahfpaCli_parse_args(NahfpaCli *self)
+CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 {
 	Logger_log(self->pre_logger, LogInfo, "Parsing CLI arguments.");
 
-	const int arg_type_count = 4;
+	const int arg_type_count = 5;
 	const char *arg_names[][2] = {
 			{"-i",  "--input"},
 			{"-o",  "--out"},
 			{"-l",  "--log-level"},
-			{"-lf", "--log-file"}
+			{"-lf", "--log-file"},
+			{"-h", "--help"}
 	};
 	char *log_level_str = NULL;
 	char **arg_ptrs[] = {&self->input_file_path, &self->out_file_path, &log_level_str, &self->log_file_path};
 
-	for (int arg_i = 1; arg_i < self->arg_count - 1; arg_i++) {
+	for (int arg_i = 1; arg_i < self->arg_count; arg_i++) {
 		char *arg = self->args[arg_i];
 		bool found_name = false;
 
 		for (int arg_type_i = 0; arg_type_i < arg_type_count; ++arg_type_i)
 			if ((strcmp(arg, arg_names[arg_type_i][0]) == 0 || strcmp(arg, arg_names[arg_type_i][1]) == 0)) {
+				if (arg_type_i == arg_type_count - 1)
+					return HelpMode; // Help flag triggers help mode
+
 				if (*(arg_ptrs[arg_type_i]) == NULL) {
 					*(arg_ptrs[arg_type_i]) = self->args[arg_i + 1];
 					found_name = true;
 					arg_i++; // To skip next arg
-				} else
-					Logger_log(self->pre_logger, LogWarning, "NAPFHA loaded...");
+				} else {
+					Logger_log(self->pre_logger, LogWarning, "Value for argument: %s, already specified", arg);
+					found_name = true;
+				}
 			}
 
 		if (!found_name)
@@ -109,24 +111,45 @@ void NahfpaCli_parse_args(NahfpaCli *self)
 		self->out_file_path = "out.svg";
 
 	NahfpaCli_parse_min_log_level_from_string(self, log_level_str);
-
-
 	NahfpaCli_log_args(self);
+
+	self->logger = Logger_new(self->min_log_level, self->log_file_path);
+
+	return CompileMode;
 }
 
 void NahfpaCli_compile(NahfpaCli *self)
 {
-	Logger_log(self->pre_logger, LogInfo, "NAPFHA - the MathTex like compiler");
-	NahfpaCli_parse_args(self);
-
-	Logger_log(self->pre_logger, LogError, "NAPFHA loaded...");
+	Logger_log(self->logger, LogError, "NAPFHA loaded...");
 
 	DString *latex = DString_from_CString("\\frac{x + 10}{20} = 42");
-	ExpParser *parser = ExpParser_new(latex);
+	ExpParser *parser = ExpParser_new(self->logger, latex);
 
 	ExpParser_parse(parser);
 
 	ExpParser_free(parser);
+}
+
+void NahpfaCli_show_help()
+{
+	printf("%s",HELP_TEXT);
+}
+
+void NahfpaCli_execute(NahfpaCli *self)
+{
+	Logger_log(self->pre_logger, LogInfo, "NAPFHA - the MathTex like compiler");
+	CliMode running_mode = NahfpaCli_parse_args_get_cli_mode(self);
+
+	switch (running_mode) {
+		case HelpMode:
+			NahpfaCli_show_help();
+			break;
+		case CompileMode:
+			NahfpaCli_compile(self);
+			break;
+		default:
+			break;
+	}
 }
 
 void NahfpaCli_free(NahfpaCli *self)

@@ -2,12 +2,10 @@
 // Created by barna on 10/09/2020.
 //
 
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "dbgalloc/m.h"
-#include <stdlib.h>
 #include "DString.h"
+#include "debugmalloc.h"
 
 struct DString
 {
@@ -42,7 +40,10 @@ char* DString_to_CString(DString* self)
 
 int DString_len(const DString* self)
 {
-	return (int)strlen(self->data);
+	if (self->data)
+		return (int)strlen(self->data);
+
+	return 0;
 }
 
 void DString_add_char(DString* self, char chr)
@@ -62,4 +63,9 @@ void DString_free(DString* self)
 {
     free(self->data);
     free(self);
+}
+
+DString* DString_clone(DString* string)
+{
+	return DString_from_CString(DString_to_CString(string));
 }

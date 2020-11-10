@@ -1,3 +1,7 @@
+#define DEBUG
+
+#ifdef DEBUG
+
 #ifndef DEBUGMALLOC_H
 #define DEBUGMALLOC_H
 
@@ -501,3 +505,7 @@ static DebugmallocData * debugmalloc_create(void) {
 #define free(P) debugmalloc_free_full((P), "free", __FILE__, __LINE__)
 
 #endif
+
+#else
+#include <stdlib.h>
+#endif // DEBUG

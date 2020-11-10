@@ -5,6 +5,7 @@
 #ifndef UNTITLED_LINKEDLIST_H
 #define UNTITLED_LINKEDLIST_H
 
+#include <stddef.h>
 #define ListG(type) List
 
 typedef struct List {

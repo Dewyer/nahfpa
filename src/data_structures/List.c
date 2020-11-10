@@ -1,10 +1,8 @@
 //
 // Created by Rátki Barnabás on 2020. 09. 07..
 //
-#include <stdio.h>
-#include <stdlib.h>
-#include "dbgalloc/m.h"
 #include "List.h"
+#include "debugmalloc.h"
 
 List *List_new() {
     List *ll = (List*) malloc(sizeof(*ll));
@@ -62,9 +60,9 @@ void List_free_2D(List *self, void (*free_item)(void*)) {
         ptr_i = ptr_i->next_ptr;
 
         if (free_item)
-			free_item(saved_ptr);
-        else
-        	free(saved_ptr);
+			free_item(saved_ptr->item_data);
+
+		free(saved_ptr);
     }
 	free(self);
 }

@@ -5,10 +5,11 @@
 #ifndef NAHFPA_EXPPARSER_H
 #define NAHFPA_EXPPARSER_H
 
-#include "data_structures/DString.h"
+#include <logger/logger.h>
+#include <data_structures/DString.h>
 
 typedef struct ExpParser ExpParser;
-ExpParser* ExpParser_new(DString* raw_txt);
+ExpParser *ExpParser_new(Logger *logger, DString *raw_txt);
 void ExpParser_parse(ExpParser* self);
 void ExpParser_free(ExpParser* self);
 

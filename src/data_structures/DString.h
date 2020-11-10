@@ -8,6 +8,7 @@
 typedef struct DString DString;
 
 DString* DString_new();
+DString* DString_clone(DString* string);
 DString* DString_from_CString(char* str);
 char* DString_to_CString(DString* self);
 int DString_len(const DString* self);

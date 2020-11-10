@@ -2,9 +2,8 @@
 // Created by barna on 20/09/2020.
 //
 
-#include <stdlib.h>
 #include "ExpNode.h"
-#include "dbgalloc/m.h"
+#include "debugmalloc.h"
 
 ExpNode* ExpNode_new(ExpNodeType type)
 {

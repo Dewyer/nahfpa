@@ -2,10 +2,10 @@
 // Created by barna on 20/09/2020.
 //
 
-#include <stdlib.h>
 #include <stdbool.h>
 #include "ExpTokenizer.h"
 #include "data_structures/common.h"
+#include "debugmalloc.h"
 
 struct ExpTokenizer
 {
@@ -39,6 +39,7 @@ bool flush_tokenizer(List *tokens, DString *last_token_buffer)
 		return true;
 	}
 
+	DString_free(last_token_buffer);
 	return false;
 }
 

@@ -3,42 +3,48 @@
 //
 
 #include "ExpParser.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <logger/logger.h>
 #include "../expression_tokenizer/ExpTokenizer.h"
-#include "dbgalloc/m.h"
+#include "debugmalloc.h"
 
 struct ExpParser
 {
+	Logger *logger;
+
 	DString *raw_txt;
 	ListG(DString*) *tokens;
 };
 
-ExpParser *ExpParser_new(DString *raw_txt)
+ExpParser *ExpParser_new(Logger *logger, DString *raw_txt)
 {
-	ExpParser *exp = (ExpParser*) malloc(sizeof(exp));
+	ExpParser *exp = (ExpParser *) malloc(sizeof(*exp));
+	exp->logger = logger;
 	exp->raw_txt = raw_txt;
 	return exp;
 }
 
 void ExpParser_do_parse(ExpParser *self)
 {
-	printf("STEP 2. : Parse\n");
-	printf("%d", DString_len(self->raw_txt));
-	printf("STEP 2. Parsing FINISHED!\n");
+	Logger_log(self->logger, LogInfo, "STEP 2. : Parse");
+	Logger_log(self->logger, LogInfo, "%d", DString_len(self->raw_txt));
+	Logger_log(self->logger, LogInfo, "STEP 2. Parsing FINISHED!");
 }
 
 void ExpParser_tokenize(ExpParser *self)
 {
-	printf("STEP 1. : Tokenizer\n");
-	ExpTokenizer *tokenizer = ExpTokenizer_new(self->raw_txt);
+	Logger_log(self->logger, LogInfo, "STEP 1. : Tokenizer");
+
+	ExpTokenizer *tokenizer = ExpTokenizer_new(DString_clone(self->raw_txt));
 	ListG(DString*) *tokens = ExpTokenizer_tokenize(tokenizer);
-	printf("== Tokenization successfull\n");
-	for (int ii = 0; (size_t)ii < tokens->item_count; ii++) {
+
+	Logger_log(self->logger, LogInfo, "Tokenization successfull");
+
+	for (int ii = 0; (size_t) ii < tokens->item_count; ii++) {
 		DString *item = List_get(tokens, ii);
-		printf("token:'%s'\n", DString_to_CString(item));
+		Logger_log(self->logger, LogInfo, "\tToken:'%s'", DString_to_CString(item));
 	}
-	printf("STEP 1. Tokenization FINISHED!\n");
+	Logger_log(self->logger, LogInfo, "STEP 1. Tokenization FINISHED!");
 	self->tokens = tokens;
 
 	ExpTokenizer_free(tokenizer);
@@ -49,7 +55,6 @@ void ExpParser_parse(ExpParser *self)
 	ExpParser_tokenize(self);
 	ExpParser_do_parse(self);
 }
-
 
 void ExpParser_free(ExpParser *self)
 {
