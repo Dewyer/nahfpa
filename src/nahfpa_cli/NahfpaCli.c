@@ -122,7 +122,7 @@ void NahfpaCli_compile(NahfpaCli *self)
 {
 	Logger_log(self->logger, LogError, "NAPFHA loaded...");
 
-	DString *latex = DString_from_CString("\\frac{x + 10}{20} = 42");
+	DString *latex = DString_from_CString("42,222 42.000 \\{ 1234");
 	ExpParser *parser = ExpParser_new(self->logger, latex);
 
 	ExpParser_parse(parser);

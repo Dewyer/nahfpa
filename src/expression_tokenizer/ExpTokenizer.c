@@ -14,7 +14,7 @@ struct ExpTokenizer
 
 ExpTokenizer *ExpTokenizer_new(DString *raw_txt)
 {
-	ExpTokenizer *exp = (ExpTokenizer*) malloc(sizeof(exp));
+	ExpTokenizer *exp = (ExpTokenizer *) malloc(sizeof(exp));
 	exp->raw_txt = raw_txt;
 
 	return exp;
@@ -41,6 +41,21 @@ bool flush_tokenizer(List *tokens, DString *last_token_buffer)
 
 	DString_free(last_token_buffer);
 	return false;
+}
+
+ListG(DString*) *ExpTokenizer_union_escape_sequences(ListG(DString*) *tokens)
+{
+	ListG(DString*) *new_tokens = List_new();
+
+	for (int token_i = 0; (size_t)token_i < tokens->item_count -1; ++token_i) {
+		const DString *at_token = List_get(tokens, token_i);
+		const DString *next_token = List_get(tokens, token_i);
+
+
+	}
+
+	List_free_2D(tokens, (void (*)(void *)) DString_free);
+	return new_tokens;
 }
 
 ListG(DString*) *ExpTokenizer_tokenize(const ExpTokenizer *self)
@@ -82,6 +97,7 @@ ListG(DString*) *ExpTokenizer_tokenize(const ExpTokenizer *self)
 	bool did_flush_last_token = flush_tokenizer(tokens, last_token_buffer);
 	if (!did_flush_last_token)
 		DString_free(last_token_buffer);
+
 
 	return tokens;
 }

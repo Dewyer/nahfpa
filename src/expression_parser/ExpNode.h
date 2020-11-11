@@ -13,7 +13,10 @@ typedef enum ExpNodeType {
 	SubScript,
 	Frac,
 	NodeList,
-	Symbol
+	Symbol,
+	Sum,
+	Mul,
+	Sqrt
 
 } ExpNodeType;
 
@@ -22,7 +25,7 @@ typedef struct ExpNode
 	ExpNodeType type;
 	struct ExpNode* arg1;
 	struct ExpNode* arg2;
-	List* node_list;
+	ListG(struct ExpNode)* node_list;
 	DString* symbol;
 
 	struct ExpNode* parent;

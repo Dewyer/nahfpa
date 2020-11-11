@@ -7,6 +7,7 @@
 #include <logger/logger.h>
 #include "../expression_tokenizer/ExpTokenizer.h"
 #include "debugmalloc.h"
+#include "ExpNode.h"
 
 struct ExpParser
 {
@@ -28,6 +29,14 @@ void ExpParser_do_parse(ExpParser *self)
 {
 	Logger_log(self->logger, LogInfo, "STEP 2. : Parse");
 	Logger_log(self->logger, LogInfo, "%d", DString_len(self->raw_txt));
+
+	//ExpNode *leaf = ExpNode_new(NodeList);
+
+	for (int token_i = 0; (size_t)token_i < self->tokens->item_count; token_i++)
+	{
+
+	}
+
 	Logger_log(self->logger, LogInfo, "STEP 2. Parsing FINISHED!");
 }
 
