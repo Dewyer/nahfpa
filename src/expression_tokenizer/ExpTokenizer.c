@@ -43,18 +43,37 @@ bool flush_tokenizer(List *tokens, DString *last_token_buffer)
 	return false;
 }
 
-ListG(DString*) *ExpTokenizer_union_escape_sequences(ListG(DString*) *tokens)
+bool is_token_escapable(const DString *token)
+{
+	return DString_eq_CString(token, "{") || DString_eq_CString(token, "}");
+}
+
+ListG(DString*) *ExpTokenizer_union_escape_sequences(const ListG(DString*) *tokens)
 {
 	ListG(DString*) *new_tokens = List_new();
+	int last_token_concated = -1;
 
-	for (int token_i = 0; (size_t)token_i < tokens->item_count -1; ++token_i) {
-		const DString *at_token = List_get(tokens, token_i);
-		const DString *next_token = List_get(tokens, token_i);
+	for (int token_i = 0; (size_t) token_i < tokens->item_count - 1; ++token_i) {
+		DString *at_token = List_get(tokens, token_i);
+		const DString *next_token = List_get(tokens, token_i+1);
+		const bool at_backslash = DString_eq_CString(at_token, "\\");
 
+		if (at_backslash && is_token_escapable(next_token)) {
+			DString *new_token = DString_clone(at_token);
+			DString_concat(new_token, next_token);
 
+			List_push(new_tokens, new_token);
+			token_i++;
+			last_token_concated = token_i;
+		} else {
+			List_push(new_tokens, DString_clone(at_token));
+			last_token_concated = -1;
+		}
 	}
 
-	List_free_2D(tokens, (void (*)(void *)) DString_free);
+	if (last_token_concated != (int)tokens->item_count-1)
+		List_push(new_tokens, DString_clone(List_get(tokens, tokens->item_count-1)));
+
 	return new_tokens;
 }
 
@@ -98,8 +117,10 @@ ListG(DString*) *ExpTokenizer_tokenize(const ExpTokenizer *self)
 	if (!did_flush_last_token)
 		DString_free(last_token_buffer);
 
+	ListG(DString*) *escaped_tokens = ExpTokenizer_union_escape_sequences(tokens);
+	List_free_2D(tokens, (void (*)(void *)) DString_free);
 
-	return tokens;
+	return escaped_tokens;
 }
 
 void ExpTokenizer_free(ExpTokenizer *self)

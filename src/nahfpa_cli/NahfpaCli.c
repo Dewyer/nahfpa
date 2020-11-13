@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <utils/cassert.h>
 #include <utils/help_txt.h>
+#include <utils/test_script.h>
 #include "NahfpaCli.h"
 #include "data_structures/DString.h"
 #include "expression_parser/ExpParser.h"
@@ -122,7 +123,7 @@ void NahfpaCli_compile(NahfpaCli *self)
 {
 	Logger_log(self->logger, LogError, "NAPFHA loaded...");
 
-	DString *latex = DString_from_CString("42,222 42.000 \\{ 1234");
+	DString *latex = DString_from_CString(TEST_SCRIPT);
 	ExpParser *parser = ExpParser_new(self->logger, latex);
 
 	ExpParser_parse(parser);

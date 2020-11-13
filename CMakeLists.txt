@@ -31,4 +31,4 @@ add_executable(nahfpa
         src/logger/logger.h
         src/nahfpa_cli/NahfpaCli.c
         src/nahfpa_cli/NahfpaCli.h
-        src/utils/cassert.c src/utils/cassert.h src/utils/help_txt.h src/utils/help_txt.c src/utils/help_txt.h)
+        src/utils/cassert.c src/utils/cassert.h src/utils/help_txt.h src/utils/help_txt.c src/utils/help_txt.h src/utils/test_script.c src/utils/test_script.h)
