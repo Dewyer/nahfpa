@@ -89,17 +89,21 @@ void Logger_print_head(Logger *self, LogLevel level)
 
 void Logger_log(Logger *self, LogLevel level, char *format, ...)
 {
+	va_list ap;
+	va_start(ap, format);
+	Logger_log_varg(self, level, format, ap);
+
+	va_end(ap);
+}
+
+void Logger_log_varg(Logger *self, LogLevel level, char *format, va_list va_list)
+{
 	if (level < self->min_level)
 		return;
 
-	va_list ap;
-	va_start(ap, format);
-
 	Logger_print_head(self, level);
-	vfprintf(self->out_file, format, ap);
+	vfprintf(self->out_file, format, va_list);
 	fprintf(self->out_file, "\n");
-
-	va_end(ap);
 }
 
 void Logger_free(Logger *self)

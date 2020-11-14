@@ -27,4 +27,6 @@ void DString_free(DString *self);
 
 void DString_concat(DString *self, const DString *string2);
 
+bool DString_starts_with(DString *self, char *string2);
+
 #endif //NAHFPA_DSTRING_H

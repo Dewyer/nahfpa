@@ -7,16 +7,18 @@
 
 #include "data_structures/DString.h"
 #include "data_structures/List.h"
+#include "TokenSlice.h"
 
-typedef enum ExpNodeType {
+typedef enum ExpNodeType
+{
 	SuperScript,
 	SubScript,
-	Frac,
 	NodeList,
 	Symbol,
 	Literal,
+	Frac,
 	Sum,
-	Mul,
+	Prod,
 	Sqrt
 
 } ExpNodeType;
@@ -24,17 +26,22 @@ typedef enum ExpNodeType {
 typedef struct ExpNode
 {
 	ExpNodeType type;
-	struct ExpNode* arg1;
-	struct ExpNode* arg2;
-	ListG(struct ExpNode)* node_list;
-	DString* value;
+	struct ExpNode *arg1;
+	struct ExpNode *arg2;
+	ListG(struct ExpNode) *node_list;
+	DString *value;
+	TokenSlice *origin;
 
-	struct ExpNode* parent;
+	struct ExpNode *parent;
 
 } ExpNode;
 
-ExpNode* ExpNode_new(ExpNodeType type);
-ExpNode* ExpNode_from_symbol(DString* symbol_str);
-void ExpNode_free(ExpNode* self);
+ExpNode *ExpNode_new(ExpNodeType type);
+
+void ExpNode_log(const ExpNode *self, Logger *logger);
+
+void ExpNode_log_with_lvl(const ExpNode *self, Logger *logger, int lvl);
+
+void ExpNode_free(ExpNode *self);
 
 #endif //NAHFPA_EXPNODE_H

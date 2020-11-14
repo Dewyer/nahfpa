@@ -29,7 +29,7 @@ bool is_single_operator(char cc)
 {
 	return cc == '+' || cc == '-' || cc == '/' || cc == '*' || cc == '<' || cc == '>' || cc == '=' || cc == '{' ||
 		   cc == '}'
-		   || cc == '(' || cc == ')' || cc == '[' || cc == ']' || cc == '^';
+		   || cc == '(' || cc == ')' || cc == '[' || cc == ']' || cc == '^' || cc == '_';
 }
 
 bool flush_tokenizer(List *tokens, DString *last_token_buffer)

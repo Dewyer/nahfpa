@@ -88,3 +88,21 @@ void DString_concat(DString *self, const DString *string2)
 	DString_resize(self, self->capacity + string2->capacity);
 	strcat(self->data, string2->data);
 }
+
+bool DString_starts_with(DString *self, char *string2)
+{
+	const size_t len = strlen(self->data);
+	const size_t len2 = strlen(string2);
+
+	if (len2 > len)
+		return false;
+
+	for (size_t ii= 0; ii < len; ++ii) {
+		if (ii >= len2)
+			break;
+		if (self->data[ii] != string2[ii])
+			return false;
+	}
+
+	return true;
+}

@@ -4,4 +4,4 @@
 
 #include "test_script.h"
 
-const char *TEST_SCRIPT = "\\{ 1234 \\} 11 \\{";
+const char *TEST_SCRIPT = "^\\frac{10}{20} 100_";
