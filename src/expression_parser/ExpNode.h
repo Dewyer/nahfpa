@@ -14,6 +14,7 @@ typedef enum ExpNodeType {
 	Frac,
 	NodeList,
 	Symbol,
+	Literal,
 	Sum,
 	Mul,
 	Sqrt
@@ -26,7 +27,7 @@ typedef struct ExpNode
 	struct ExpNode* arg1;
 	struct ExpNode* arg2;
 	ListG(struct ExpNode)* node_list;
-	DString* symbol;
+	DString* value;
 
 	struct ExpNode* parent;
 

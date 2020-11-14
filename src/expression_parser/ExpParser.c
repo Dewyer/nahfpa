@@ -25,6 +25,16 @@ ExpParser *ExpParser_new(Logger *logger, DString *raw_txt)
 	return exp;
 }
 
+// Marking first and last real token inside list
+ExpNode *ExpParser_parse_node_list(int start_i, int end_i)
+{
+	ExpNode *node = ExpNode_new(NodeList);
+	for (int at_token_i = start_i; at_token_i <= end_i; ++at_token_i) {
+
+	}
+
+}
+
 void ExpParser_do_parse(ExpParser *self)
 {
 	Logger_log(self->logger, LogInfo, "STEP 2. : Parse");
@@ -43,6 +53,7 @@ void ExpParser_do_parse(ExpParser *self)
 void ExpParser_tokenize(ExpParser *self)
 {
 	Logger_log(self->logger, LogInfo, "STEP 1. : Tokenizer");
+	Logger_log(self->logger, LogInfo, "INPUT: %s", DString_to_CString(self->raw_txt));
 
 	ExpTokenizer *tokenizer = ExpTokenizer_new(DString_clone(self->raw_txt));
 	ListG(DString*) *tokens = ExpTokenizer_tokenize(tokenizer);
