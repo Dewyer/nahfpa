@@ -1,0 +1,104 @@
+%! suppress = Unicode
+\documentclass{article}[12pt,a4paper]
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage{subfiles}
+
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+filecolor=magenta,
+urlcolor=cyan,
+}
+
+\title{Félkész Jelentés}
+\author{Rátki Barnabás}
+\date{2020.11.15}
+
+\newcommand{\lang}[1]{\textit{#1}}
+\newcommand{\tbs}{\textbackslash}
+\newcommand{\tc}{\textasciicircum}
+
+\begin{document}
+    \maketitle
+
+    \section{Mi van a programból kész?}
+    A programból kész van a CLI interfész nagy része, a bemenet még nincsen kezelve, a naplózás és a parancssoros argumentumok kezelése viszont kész van.
+    Tehát a program mindig csak a forráskódba beleégetett szövegből dolgozik.
+    A nyelvi feldolgozásból a tokenizáció és a kifejezés fa már el van készítve a program által, ez tán a legfontosabb fejlemény a fejlesztés ezen szakaszában.
+    A tokenizáció során a bemeneti forrás, érdemleges részekre van felvágva, ennek a részletei ki vannak naplózva.
+    Ezekből a részekből pedig fel van építve egy kifejezés fa, ami alapján lehet elkészíteni a doboz modell fát.
+    A legtöbb nyelvi funkció már támogatva van, kivéve a kommentek és a limesz.
+    A doboz modell fa már elkészül, még nem tökéletes sok egység értéket még meg kell majd változtatni, illetve hiányzik még a gyökjel, szumma, produktum, limesz, és szimbólumok nagy részének kirajzolása.
+    A doboz modell fának az a lényege, hogy megjelenítés előtt minden kiirandó elemről megtudjuk mekkora lesz a tartalmazó doboza, és a szüleétől való pozíció különbsége.
+    A projekt tartalmaz egy CMake filet, ennek a segítségével lehet buildelni.
+
+    \section{A program felépítése}
+    Az egész forráskód az \lang{/src} mappában van.
+    A programomat kisebb modulokból építettem fel, ezek mellett vannak adat struktúrák is külön implementálva.
+    Ezek a pointereket tartalmazó linkelt lista, a \lang{List} és a dinamikus sztring a \lang{DString} (ez a későbbi még nem teljesen végleges, a későbbiekben C\# stílusura fogom átalakítani és nagyobb kapacitással fog rendelkezni mint a szükséges a fölösleges allokációk elkerülése végett.)
+    A program részét képezi még a \lang{/utils} mappában levő segéd fileok, amik főleg definíciókat konstansokat és hasonló dolgokat tartalmaznak.
+    Az alábbiakban részletezem a forrásfileok melyik részeit tartalmazzák a programnak (a feladatkiírás szerint):
+    
+    \subsection{data\_structures/DString}
+    Dinamikus sztring implementácó a fentebb leírtak szerint.
+    A struktúra nem teljes, ezzel a mezők el vannak rejtve a felhasználóktól, ez egy tudatos dizájn döntés.
+
+    \subsection{data\_structures/List}
+    Pointereket tartalmazó linkelt lista implementáció, definiál egy tisztán fejlesztési időben hasznos makrót a \lang{ListG}-t ami csak annyit tud, hogy a tipus meghatározásakor beleírhattam, hogy az adott list milyen tipusu pointereket tartalmaz.
+    Ez az infó fordítás közben el van dobva.
+
+    \subsection{expression\_parser/ExpNode}
+    Ez a szubfolder a kifejezés feldolgozással foglalkozik, a kifejezés node a kifejezés fa adatstruktúrája, tartalmazza, hogy milyen argumentumai vannak a kifejezésnek, a tipusát és más hasznos információkat.
+    Itt van definiálva a kifejezés fa naplózásához használható függvény.
+
+    \subsection{expression\_parser/ExpParser}
+    Ez a konkrét kifejezés feldolgozó modull.
+    Ez használja a tokenizáló modult.
+    Működésének kimenete a nyelvi kifejezés fa.
+    
+    \subsection{expression\_parser/TokenSlice}
+    Egy segéd struktúra, ami definiálja a token listának egy indexekkel megadott szakaszát.
+    
+    \subsection{expression\_tokenizer/ExpTokenizer}
+    Ezt a modult használja az ExpParser, egy egybefüggő sztringet vág szét használható szakaszokra.
+
+    \subsection{logger/Logger}
+    A naplózásért felelős modul, lehet megadni szinteket, illetve a létrehozásakor megadott konfiguráció szerint nem mindent ír ki, illetve fájlba is tud dolgozni.
+
+    \subsection{nahfpa\_cli/NahfpaCli}
+    A program főmodulja.
+    Bemeneti a parancssoros argumentumok száma és értéke, ez hajta végre a fordítást és ehhez használja a kifejezés parszer modult és az svg gyártó modult.
+
+    \subsection{svg\_factory/SVGFactory}
+    A kifejezésfából először a box modell modul felhasználásával box modell fát, majd abból egy svg fájlt hoz létre.
+    Az SvgFile modult használja a fájl létrehozására.
+
+    \subsection{svg\_file/SvgFile}
+    Ez a modul absztraktálja az svg generálás részleteit.
+
+    \subsection{utils/cassert}
+    Egy rövid függvényt definiál ami a standard assert kifejezés előtt kinaplózza a hibaüzenetet.
+
+    \subsection{utils/geometry}
+    A pont és méret struktúrákat és segédfüggvényeit tartalmazzák, az SvgFactory és SvgFile használják.
+
+    \subsection{utils/help\_text}
+    A \lang{--help} cli kapcsolóval elérhető segítség képernyő tartalmát definiálja.
+
+    \subsection{utils/rendering\_constants}
+    Svg megjelenítéshez szükséges konstansokat tartalmaz, például a betűk méretét.
+
+    \subsection{utils/symbols\_helper}
+    A támogatott szimbólumok definícióját és helyettesítési értékeit tartalmazza, egy segédfüggvénnyel ami megnézni, hogy az adott parancs milyen támogatott szimbólumot tartalmaz.
+
+    \subsection{utils/test\_script}
+    A program által jelenleg felhasznált bemenetet tartalmazza.
+
+    \section{Összefoglaló}
+    A program véleményem szerint a program több mint fele készenvan, sok nehéz részleten túlvagyok.
+    A polírozás és több funkció implementálása még hátra van, de ezek már hasonlítanak elkészült dolgokhoz.
+\end{document}

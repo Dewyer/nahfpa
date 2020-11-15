@@ -1,0 +1,6 @@
+# Latex compiled files
+**.aux
+**.log
+**.out
+**.synctex.gz
+**.pdf
