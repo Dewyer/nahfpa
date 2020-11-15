@@ -27,6 +27,11 @@ void Box_horizontal_center(Vector *pos, const Size *box, const Size *container)
 	pos->x = container->with / 2 - box->with / 2;
 }
 
+void Box_vertical_center(Vector *pos, const Size *box, const Size *container)
+{
+	pos->y = container->height / 2 - box->height/2;
+}
+
 double double_max(double aa, double bb)
 {
 	return aa > bb ? aa : bb;

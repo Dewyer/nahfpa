@@ -176,13 +176,9 @@ ExpNode *ExpParser_parse_sub_or_superscript(DString *script_token, size_t script
 
 ExpNode *ExpParser_parse_symbol(ExpParser *self, DString *sym, size_t sym_i)
 {
-	bool found_symbol = false;
-	for (int ii = 0; ii < SUPPORTED_SYMBOL_COUNT; ++ii) {
-		if (DString_eq_CString(sym, SUPPORTED_SYMBOLS[ii].command))
-			found_symbol = true;
-	}
+	SymbolDefinitionFindResults results = SymbolDefinition_get_supported_results(sym);
 
-	cassert(self->logger, found_symbol, "%s is not a supported command", DString_to_CString(sym));
+	cassert(self->logger, results.found, "%s is not a supported command", DString_to_CString(sym));
 	ExpNode *node = ExpParser_parse_from_string(sym, sym_i);
 	node->type = Symbol;
 

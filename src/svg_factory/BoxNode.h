@@ -12,6 +12,7 @@
 typedef struct BoxNode
 {
 	Vector offset;
+	Vector global_pos;
 	Size box;
 
 	struct BoxNode *arg1_box;
@@ -22,6 +23,8 @@ typedef struct BoxNode
 } BoxNode;
 
 BoxNode *BoxNode_new(ExpNode *node);
+
+void BoxNode_calc_global_position(BoxNode *node, const BoxNode *parent);
 
 void BoxNode_free(BoxNode *self);
 

@@ -9,6 +9,8 @@ BoxNode *BoxNode_new(ExpNode *node)
 {
 	BoxNode *self = (BoxNode *) malloc(sizeof(*self));
 	self->node = node;
+	self->global_pos.x = 0;
+	self->global_pos.y = 0;
 	self->offset.x = 0;
 	self->offset.y = 0;
 	self->box.height = 0;
@@ -19,6 +21,12 @@ BoxNode *BoxNode_new(ExpNode *node)
 	self->node_list_box = NULL;
 
 	return self;
+}
+
+void BoxNode_calc_global_position(BoxNode *self, const BoxNode *parent)
+{
+	Vector_add_v(&self->global_pos, &parent->global_pos);
+	Vector_add_v(&self->global_pos, &self->offset);
 }
 
 void BoxNode_free(BoxNode *self)

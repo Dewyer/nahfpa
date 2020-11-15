@@ -83,6 +83,11 @@ bool DString_eq_CString(const DString* string1,const char* string2)
 	return strcmp(string1->data, string2) == 0;
 }
 
+bool DString_eq_DString(const DString *string1, const DString *string2)
+{
+	return DString_eq_CString(string1, DString_to_CString(string2));
+}
+
 void DString_concat(DString *self, const DString *string2)
 {
 	DString_resize(self, self->capacity + string2->capacity);

@@ -23,6 +23,8 @@ void DString_add_char(DString *self, char chr);
 
 bool DString_eq_CString(const DString *string1, const char *string2);
 
+bool DString_eq_DString(const DString *string1, const DString *string2);
+
 void DString_free(DString *self);
 
 void DString_concat(DString *self, const DString *string2);

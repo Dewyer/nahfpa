@@ -4,19 +4,19 @@
 #include <utils/cassert.h>
 #include <assert.h>
 #include <utils/geomerty.h>
+#include <utils/symbols_helper.h>
 #include <utils/rendering_constants.h>
 #include "SvgFactory.h"
 #include "debugmalloc.h"
 #include "BoxNode.h"
+#include "BoxModelBuilder.h"
 
 struct SvgFactory
 {
 	Logger *logger;
-	ExpNode *exp_tree_root;
+	BoxModelBuilder *box_model_builder;
 	BoxNode *box_tree_root;
-
 	char *out_file_path;
-
 	SvgFile *svg_file;
 };
 
@@ -26,152 +26,80 @@ SvgFactory *SvgFactory_new(Logger *logger, ExpNode *exp_tree_root, char *out_fil
 	assert(self && "Couldn't allocate SvgFactory");
 
 	self->logger = logger;
-	self->exp_tree_root = exp_tree_root;
+	self->box_model_builder = BoxModelBuilder_new(logger, exp_tree_root);
 	self->box_tree_root = NULL;
 	self->out_file_path = out_file_path;
-
-	FILE *file = fopen(self->out_file_path, "w");
-	cassert(self->logger, !!file, "Couldn't open output file to write to.");
-
-	self->svg_file = SvgFile_new(file);
+	self->svg_file = NULL;
 
 	return self;
 }
 
-BoxNode *SvgFactory_build_box_for_node(ExpNode *exp_node);
+void SvgFactory_render_node(SvgFactory *self, BoxNode *node);
 
-void SvgFactory_build_script_box(BoxNode *box_node, bool is_super)
+void SvgFactory_render_children(SvgFactory *self, BoxNode *node)
 {
-	const Vector *delta = &SCRIPT_BOX_DELTA;
-
-	if (box_node->node->arg1)
-		box_node->arg1_box = SvgFactory_build_box_for_node(box_node->node->arg1);
-
-	if (box_node->node->arg2)
-		box_node->arg2_box = SvgFactory_build_box_for_node(box_node->node->arg2);
-
-	if (box_node->arg1_box) {
-		if (is_super)
-			box_node->arg1_box->offset.y = box_node->arg2_box ? box_node->arg2_box->box.height + delta->y : 0;
-
-		Size_add_s(&box_node->box, &box_node->arg1_box->box);
+	if (node->arg1_box) {
+		BoxNode_calc_global_position(node->arg1_box, node);
+		SvgFactory_render_node(self, node->arg1_box);
 	}
-	if (box_node->arg1_box && box_node->arg2_box) {
-		box_node->arg2_box->offset.x = box_node->arg1_box->box.with + delta->x;
 
-		Size_add_v(&box_node->box, delta);
+	if (node->arg2_box) {
+		BoxNode_calc_global_position(node->arg2_box, node);
+		SvgFactory_render_node(self, node->arg2_box);
 	}
-	if (box_node->arg2_box) {
-		if (!is_super)
-			box_node->arg2_box->offset.y = box_node->arg1_box ? box_node->arg1_box->box.height + delta->y : 0;
 
-		Size_add_s(&box_node->box, &box_node->arg2_box->box);
-	}
+	if (node->node_list_box)
+		for (size_t ii = 0; ii < node->node_list_box->item_count; ++ii) {
+			BoxNode *at_box_node = List_get(node->node_list_box, ii);
+			BoxNode_calc_global_position(at_box_node, node);
+
+			SvgFactory_render_node(self, at_box_node);
+		}
 }
 
-void SvgFactory_build_node_list_box(BoxNode *box_node)
+void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 {
-	box_node->node_list_box = List_new();
-	const double gap = NODE_LIST_GAP;
+	if (DEBUG_BOXES)
+		SvgFile_add_box(self->svg_file, &box_node->global_pos, &box_node->box); // Debug
 
-	for (size_t ii = 0; ii < box_node->node->node_list->item_count; ++ii) {
-		ExpNode *at_node = List_get(box_node->node->node_list, ii);
-		BoxNode *at_box = SvgFactory_build_box_for_node(at_node);
+	SvgFactory_render_children(self, box_node);
 
-		if (box_node->box.height < at_box->box.height)
-			box_node->box.height = at_box->box.height;
+	if (box_node->node->type == Literal) {
+		SvgFile_add_text(self->svg_file, box_node->node->value, &box_node->global_pos);
+	} else if (box_node->node->type == Symbol) {
+		SymbolDefinitionFindResults sym_res = SymbolDefinition_get_supported_results(box_node->node->value);
+		const char *sub = sym_res.is_uppercase ? sym_res.definition->uppercase_substitution
+											   : sym_res.definition->substitution;
 
-		at_box->offset.x = box_node->box.with;
-		box_node->box.with += at_box->box.with + gap;
+		DString *sub_ds = DString_from_CString(sub);
+		SvgFile_add_text(self->svg_file, sub_ds, &box_node->global_pos);
+		DString_free(sub_ds);
 
-		List_push(box_node->node_list_box, at_box);
+	} else if (box_node->node->type == Frac) {
+		double delta_h = 0;
+		if (box_node->arg1_box)
+			delta_h += box_node->arg1_box->box.height + FRAC_LINE_HEIGHT / 2;
+
+		Vector p1 = {box_node->global_pos.x, box_node->global_pos.y + delta_h};
+		Vector p2 = {box_node->global_pos.x + box_node->box.with, box_node->global_pos.y + delta_h};
+
+		SvgFile_add_line(self->svg_file, &p1, &p2);
 	}
-	box_node->box.with -= gap;
-}
-
-void SvgFactory_build_frac_box(BoxNode *box_node)
-{
-	const double line_height = FRAC_LINE_HEIGHT;
-
-	if (box_node->node->arg1) {
-		box_node->arg1_box = SvgFactory_build_box_for_node(box_node->node->arg1);
-		box_node->box.height += box_node->arg1_box->box.height;
-	}
-
-	if (box_node->node->arg2) {
-		box_node->arg2_box = SvgFactory_build_box_for_node(box_node->node->arg2);
-		box_node->box.height += box_node->arg2_box->box.height;
-	}
-
-	box_node->box.with = double_max(box_node->arg1_box ? box_node->arg1_box->box.with : 0,
-									box_node->arg2_box ? box_node->arg2_box->box.with : 0);
-	box_node->box.height += line_height;
-
-	if (box_node->arg1_box) {
-		Box_horizontal_center(&box_node->arg1_box->offset, &box_node->arg1_box->box, &box_node->box);
-	}
-	if (box_node->arg2_box) {
-		Box_horizontal_center(&box_node->arg2_box->offset, &box_node->arg2_box->box, &box_node->box);
-		box_node->arg2_box->offset.y = (box_node->arg1_box ? box_node->arg1_box->box.height : 0) + line_height;
-	}
-}
-
-void SvgFactory_build_box_for_sqrt(BoxNode *box_node)
-{
-	const Vector *delta = &SQRT_BOX_DELTA;
-
-	box_node->arg1_box = SvgFactory_build_box_for_node(box_node->node->arg1);
-	Size_add_s(&box_node->box, &box_node->arg1_box->box);
-	Size_add_v(&box_node->box, delta);
-}
-
-void SvgFactory_build_prod_sum_box(BoxNode *box_node)
-{
-	SvgFactory_build_frac_box(box_node);
-	box_node->box.height -= FRAC_LINE_HEIGHT;
-	box_node->box.height += SUM_PROD_SIZE.height;
-	box_node->box.with = double_max(box_node->box.with, SUM_PROD_SIZE.with);
-}
-
-BoxNode *SvgFactory_build_box_for_node(ExpNode *exp_node)
-{
-	BoxNode *box = BoxNode_new(exp_node);
-
-	if (exp_node->type == Symbol) {
-		box->box.with = 20;
-		box->box.height = 20;
-	} else if (exp_node->type == Literal) {
-		box->box.height = 15;
-		box->box.with = DString_len(exp_node->value) * 10;
-	} else if (exp_node->type == SuperScript) {
-		SvgFactory_build_script_box(box, true);
-	} else if (exp_node->type == SubScript) {
-		SvgFactory_build_script_box(box, false);
-	} else if (exp_node->type == NodeList) {
-		SvgFactory_build_node_list_box(box);
-	} else if (exp_node->type == Frac) {
-		SvgFactory_build_frac_box(box);
-	} else if (exp_node->type == Sqrt) {
-		SvgFactory_build_box_for_sqrt(box);
-	} else if (exp_node->type == Sum || exp_node->type == Prod) {
-		SvgFactory_build_prod_sum_box(box);
-	}
-
-	return box;
-}
-
-void SvgFactory_build_box_model(SvgFactory *self)
-{
-	Logger_log(self->logger, LogInfo, "STEP 3. Building box model.");
-
-	BoxNode *root = SvgFactory_build_box_for_node(self->exp_tree_root);
-	self->box_tree_root = root;
 }
 
 void SvgFactory_create(SvgFactory *self)
 {
-	Logger_log(self->logger, LogInfo, "box stuff");
-	SvgFactory_build_box_model(self);
+	BoxNode *box_root = BoxModelBuilder_build(self->box_model_builder);
+	self->box_tree_root = box_root;
+	Logger_log(self->logger, LogInfo, "Box model dimensions: w: %f, h: %f", box_root->box.with, box_root->box.height);
+	Logger_log(self->logger, LogInfo, "STEP 3. Box Model built");
+
+	FILE *file = fopen(self->out_file_path, "w");
+	cassert(self->logger, !!file, "Couldn't open output file to write to.");
+	self->svg_file = SvgFile_new(file, &box_root->box);
+
+	SvgFactory_render_node(self, box_root);
+	Logger_log(self->logger, LogInfo, "STEP 4. Rendering done.");
 }
 
 void SvgFactory_free(SvgFactory *self)
@@ -179,6 +107,10 @@ void SvgFactory_free(SvgFactory *self)
 	if (self->box_tree_root)
 		BoxNode_free(self->box_tree_root);
 
-	SvgFile_close(self->svg_file);
+	BoxModelBuilder_free(self->box_model_builder);
+
+	if (self->svg_file)
+		SvgFile_close(self->svg_file);
+
 	free(self);
 }

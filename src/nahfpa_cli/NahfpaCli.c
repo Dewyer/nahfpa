@@ -110,7 +110,7 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 	}
 
 	if (self->out_file_path == NULL) // default out path
-		self->out_file_path = "out.svg";
+		self->out_file_path = "./out.svg";
 
 	NahfpaCli_parse_min_log_level_from_string(self, log_level_str);
 	NahfpaCli_log_args(self);
