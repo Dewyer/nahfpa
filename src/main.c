@@ -4,9 +4,9 @@
 
 int main(int argc, char *argv[])
 {
-	NahfpaCli* cli = NahfpaCli_new(argc, argv);
+	NahfpaCli *cli = NahfpaCli_new(argc, argv);
 	NahfpaCli_execute(cli);
 
 	NahfpaCli_free(cli);
-    return 0;
+	return 0;
 }

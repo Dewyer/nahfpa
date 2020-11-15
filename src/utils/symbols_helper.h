@@ -11,7 +11,8 @@
 #define SUPPORTED_SYMBOL_COUNT 3
 
 
-typedef struct SymbolDefinition {
+typedef struct SymbolDefinition
+{
 	char *command;
 	char *substitution;
 	char *uppercase_substitution;

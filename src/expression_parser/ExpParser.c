@@ -208,18 +208,16 @@ void ExpParser_transform_node_list_for_scripts(ExpParser *self, ExpNode *node_li
 	for (size_t ii = 0; ii < node_list->node_list->item_count; ++ii) {
 		bool skip = false;
 		ExpNode *at_node = List_get(node_list->node_list, ii);
-		if ( ii < node_list->node_list->item_count-1)
-		{
-			ExpNode *next_node = List_get(node_list->node_list, ii+1);
+		if (ii < node_list->node_list->item_count - 1) {
+			ExpNode *next_node = List_get(node_list->node_list, ii + 1);
 			if (next_node->type == SubScript || next_node->type == SuperScript) {
 				skip = true;
 				next_node->arg1 = at_node;
 				next_node->origin->start = at_node->origin->start;
 			}
 		}
-		if (ii != 0)
-		{
-			ExpNode *last_node = List_get(node_list->node_list, ii-1);
+		if (ii != 0) {
+			ExpNode *last_node = List_get(node_list->node_list, ii - 1);
 			if (last_node->type == SubScript || last_node->type == SuperScript) {
 				skip = true;
 				last_node->arg2 = at_node;

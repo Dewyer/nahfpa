@@ -53,7 +53,7 @@ SymbolDefinitionFindResults SymbolDefinition_get_supported_results(DString *comm
 {
 	SymbolDefinitionFindResults results = {false, NULL, false};
 
-	char* cmd_str_lower = DString_to_CString(command);
+	char *cmd_str_lower = DString_to_CString(command);
 	if (DString_len(command) > 1)
 		cmd_str_lower[1] = tolower(cmd_str_lower[1]);
 
@@ -64,9 +64,7 @@ SymbolDefinitionFindResults SymbolDefinition_get_supported_results(DString *comm
 		if (DString_eq_CString(command, at_definition->command)) {
 			results.found = true;
 			results.definition = at_definition;
-		}
-		else if (at_definition->uppercase_substitution && DString_eq_CString(cmd_lower, at_definition->command))
-		{
+		} else if (at_definition->uppercase_substitution && DString_eq_CString(cmd_lower, at_definition->command)) {
 			results.found = true;
 			results.definition = at_definition;
 			results.is_uppercase = true;

@@ -7,21 +7,22 @@
 #include "BoxNode.h"
 #include "debugmalloc.h"
 
-struct BoxModelBuilder {
+struct BoxModelBuilder
+{
 	Logger *logger;
 	ExpNode *exp_tree_root;
 };
 
-BoxModelBuilder* BoxModelBuilder_new(Logger *logger, ExpNode *exp_tree_root)
+BoxModelBuilder *BoxModelBuilder_new(Logger *logger, ExpNode *exp_tree_root)
 {
-	BoxModelBuilder* self = (BoxModelBuilder*) malloc(sizeof(*self));
+	BoxModelBuilder *self = (BoxModelBuilder *) malloc(sizeof(*self));
 	self->logger = logger;
 	self->exp_tree_root = exp_tree_root;
 
 	return self;
 }
 
-void BoxModelBuilder_free(BoxModelBuilder* self)
+void BoxModelBuilder_free(BoxModelBuilder *self)
 {
 	free(self);
 }

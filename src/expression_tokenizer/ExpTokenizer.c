@@ -55,7 +55,7 @@ ListG(DString*) *ExpTokenizer_union_escape_sequences(const ListG(DString*) *toke
 
 	for (int token_i = 0; (size_t) token_i < tokens->item_count - 1; ++token_i) {
 		DString *at_token = List_get(tokens, token_i);
-		const DString *next_token = List_get(tokens, token_i+1);
+		const DString *next_token = List_get(tokens, token_i + 1);
 		const bool at_backslash = DString_eq_CString(at_token, "\\");
 
 		if (at_backslash && is_token_escapable(next_token)) {
@@ -71,8 +71,8 @@ ListG(DString*) *ExpTokenizer_union_escape_sequences(const ListG(DString*) *toke
 		}
 	}
 
-	if (last_token_concated != (int)tokens->item_count-1)
-		List_push(new_tokens, DString_clone(List_get(tokens, tokens->item_count-1)));
+	if (last_token_concated != (int) tokens->item_count - 1)
+		List_push(new_tokens, DString_clone(List_get(tokens, tokens->item_count - 1)));
 
 	return new_tokens;
 }

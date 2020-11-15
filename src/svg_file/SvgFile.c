@@ -26,21 +26,23 @@ SvgFile *SvgFile_new(FILE *file, Size *view_port)
 	return self;
 }
 
-void SvgFile_add_text(SvgFile *self,const DString *text,const Vector *pos)
+void SvgFile_add_text(SvgFile *self, const DString *text, const Vector *pos)
 {
-	fprintf(self->file, "\t<text class=\"text\" x=\"%f\" y=\"%f\">%s</text>\n", pos->x, pos->y+TEXT_HEIGHT-TEXT_CORRECTION,
+	fprintf(self->file, "\t<text class=\"text\" x=\"%f\" y=\"%f\">%s</text>\n", pos->x,
+			pos->y + TEXT_HEIGHT - TEXT_CORRECTION,
 			DString_to_CString(text));
 }
 
-void SvgFile_add_line(SvgFile *self,const Vector *p1,const Vector *p2)
+void SvgFile_add_line(SvgFile *self, const Vector *p1, const Vector *p2)
 {
 	fprintf(self->file, "\t<line class=\"line\" x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" />\n", p1->x, p1->y, p2->x,
 			p2->y);
 }
 
-void SvgFile_add_box(SvgFile *self,const Vector *pp,const Size *size)
+void SvgFile_add_box(SvgFile *self, const Vector *pp, const Size *size)
 {
-	fprintf(self->file, "\t<rect class=\"box\" x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" />\n", pp->x, pp->y, size->with,
+	fprintf(self->file, "\t<rect class=\"box\" x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" />\n", pp->x, pp->y,
+			size->with,
 			size->height);
 }
 

@@ -8,16 +8,21 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-typedef enum LogLevel {LogInfo=0, LogWarning=1, LogError=2} LogLevel;
+typedef enum LogLevel
+{
+	LogInfo = 0, LogWarning = 1, LogError = 2
+} LogLevel;
 
 typedef struct Logger Logger;
 
-Logger* Logger_new(LogLevel min_level, char *out_path);
-void Logger_free(Logger* self);
+Logger *Logger_new(LogLevel min_level, char *out_path);
 
-void Logger_log(Logger* self, LogLevel level, char* format, ...);
+void Logger_free(Logger *self);
+
+void Logger_log(Logger *self, LogLevel level, char *format, ...);
+
 void Logger_log_varg(Logger *self, LogLevel level, char *format, va_list va_list);
 
-char* LogLevel_to_string(const LogLevel level);
+char *LogLevel_to_string(const LogLevel level);
 
 #endif //NAHFPA_LOGGER_H

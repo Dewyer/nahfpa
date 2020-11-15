@@ -21,12 +21,12 @@ ExpNode *ExpNode_new(ExpNodeType type)
 
 char *get_tab_prefix(int lvl)
 {
-	char *pref = (char *) calloc(2*lvl + 1, sizeof(*pref));
+	char *pref = (char *) calloc(2 * lvl + 1, sizeof(*pref));
 	for (int ii = 0; ii < lvl; ++ii) {
-		pref[ii*2] = '\t';
-		pref[ii*2 +1] = '\t';
+		pref[ii * 2] = '\t';
+		pref[ii * 2 + 1] = '\t';
 	}
-	pref[2*lvl] = '\0';
+	pref[2 * lvl] = '\0';
 
 	return pref;
 }

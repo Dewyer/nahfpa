@@ -5,6 +5,6 @@
 #ifndef NAHFPA_HELP_TXT_H
 #define NAHFPA_HELP_TXT_H
 
-extern const char* HELP_TEXT;
+extern const char *HELP_TEXT;
 
 #endif //NAHFPA_HELP_TXT_H

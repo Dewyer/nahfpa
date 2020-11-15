@@ -10,7 +10,10 @@
 #include "expression_parser/ExpParser.h"
 #include "debugmalloc.h"
 
-typedef enum CliMode {HelpMode, CompileMode} CliMode;
+typedef enum CliMode
+{
+	HelpMode, CompileMode
+} CliMode;
 
 struct NahfpaCli
 {
@@ -81,7 +84,7 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 			{"-o",  "--out"},
 			{"-l",  "--log-level"},
 			{"-lf", "--log-file"},
-			{"-h", "--help"}
+			{"-h",  "--help"}
 	};
 	char *log_level_str = NULL;
 	char **arg_ptrs[] = {&self->input_file_path, &self->out_file_path, &log_level_str, &self->log_file_path};
@@ -140,7 +143,7 @@ void NahfpaCli_compile(NahfpaCli *self)
 
 void NahpfaCli_show_help()
 {
-	printf("%s",HELP_TEXT);
+	printf("%s", HELP_TEXT);
 }
 
 void NahfpaCli_execute(NahfpaCli *self)

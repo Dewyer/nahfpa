@@ -4,4 +4,4 @@
 
 #include "test_script.h"
 
-const char *TEST_SCRIPT = "\\frac{ \\alpha + b^3 + 100}{20} = 20";
+const char *TEST_SCRIPT = "\\frac{ \\Alpha + b^3 + 100}{20} = 20";

@@ -9,8 +9,10 @@
 
 typedef struct ExpTokenizer ExpTokenizer;
 
-ExpTokenizer* ExpTokenizer_new(DString* raw_txt);
-List* ExpTokenizer_tokenize(const ExpTokenizer* self);
-void ExpTokenizer_free(ExpTokenizer* self);
+ExpTokenizer *ExpTokenizer_new(DString *raw_txt);
+
+List *ExpTokenizer_tokenize(const ExpTokenizer *self);
+
+void ExpTokenizer_free(ExpTokenizer *self);
 
 #endif //NAHFPA_EXPTOKENIZER_H
