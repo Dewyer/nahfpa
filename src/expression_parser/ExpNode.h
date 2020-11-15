@@ -18,9 +18,9 @@ typedef enum ExpNodeType
 	Symbol,
 	Literal,
 	Frac,
+	Sqrt,
 	Sum,
-	Prod,
-	Sqrt
+	Prod
 
 } ExpNodeType;
 

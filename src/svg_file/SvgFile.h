@@ -3,7 +3,8 @@
 
 typedef struct SvgFile SvgFile;
 
-SvgFile* SvgFile_new();
-void SvgFile_free(SvgFile* self);
+SvgFile *SvgFile_new();
+
+void SvgFile_close(SvgFile *self);
 
 #endif //NAHFPA_SVGFILE_H

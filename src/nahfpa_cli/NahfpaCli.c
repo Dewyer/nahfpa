@@ -124,11 +124,14 @@ void NahfpaCli_compile(NahfpaCli *self)
 {
 	Logger_log(self->logger, LogError, "NAPFHA loaded...");
 
+	// FIXME Read from file or from the command line
 	DString *latex = DString_from_CString(TEST_SCRIPT);
 	ExpParser *parser = ExpParser_new(self->logger, latex);
 
 	ExpNode *exp_tree_root = ExpParser_parse(parser);
+
 	SvgFactory *svg_factory = SvgFactory_new(self->logger, exp_tree_root, self->out_file_path);
+	SvgFactory_create(svg_factory);
 
 	ExpNode_free(exp_tree_root);
 	SvgFactory_free(svg_factory);

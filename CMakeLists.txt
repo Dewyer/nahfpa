@@ -46,4 +46,4 @@ add_executable(nahfpa
         src/svg_factory/SvgFactory.h
         src/svg_file/SvgFile.c
         src/svg_file/SvgFile.h
-        )
+        src/svg_factory/BoxNode.c src/svg_factory/BoxNode.h src/utils/geomerty.c src/utils/geomerty.h src/utils/rendering_constants.c src/utils/rendering_constants.h)

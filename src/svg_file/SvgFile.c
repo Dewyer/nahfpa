@@ -1,3 +1,4 @@
+#include "stdio.h"
 #include "SvgFile.h"
 #include "debugmalloc.h"
 
@@ -14,7 +15,8 @@ SvgFile *SvgFile_new(FILE *file)
 	return self;
 }
 
-void SvgFile_free(SvgFile *self)
+void SvgFile_close(SvgFile *self)
 {
+	fclose(self->file);
 	free(self);
 }
