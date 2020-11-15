@@ -17,8 +17,6 @@ struct ExpParser
 
 	DString *raw_txt;
 	ListG(DString*) *tokens;
-
-	ExpNode *exp_node_root;
 };
 
 ExpParser *ExpParser_new(Logger *logger, DString *raw_txt)
@@ -273,19 +271,20 @@ ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice)
 	return node;
 }
 
-void ExpParser_do_parse(ExpParser *self)
+ExpNode *ExpParser_do_parse(ExpParser *self)
 {
 	Logger_log(self->logger, LogInfo, "STEP 2. : Parse");
 
 	TokenSlice *main_slice = TokenSlice_new(0, self->tokens->item_count - 1);
 	ExpNode *root = ExpParser_parse_node_list(self, main_slice);
-	self->exp_node_root = root;
 
 	Logger_log(self->logger, LogInfo, "=========== PARSED EXP ROOT : ==============");
 	ExpNode_log(root, self->logger);
 	Logger_log(self->logger, LogInfo, "=============================================");
 
 	Logger_log(self->logger, LogInfo, "STEP 2. Parsing FINISHED!");
+
+	return root;
 }
 
 void ExpParser_tokenize(ExpParser *self)
@@ -308,18 +307,16 @@ void ExpParser_tokenize(ExpParser *self)
 	ExpTokenizer_free(tokenizer);
 }
 
-void ExpParser_parse(ExpParser *self)
+ExpNode *ExpParser_parse(ExpParser *self)
 {
 	ExpParser_tokenize(self);
-	ExpParser_do_parse(self);
+	return ExpParser_do_parse(self);
 }
 
 void ExpParser_free(ExpParser *self)
 {
 	DString_free(self->raw_txt);
 	List_free_2D(self->tokens, (void (*)(void *)) DString_free);
-
-	ExpNode_free(self->exp_node_root);
 
 	free(self);
 }

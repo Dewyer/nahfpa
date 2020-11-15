@@ -7,10 +7,14 @@
 
 #include <logger/logger.h>
 #include <data_structures/DString.h>
+#include "ExpNode.h"
 
 typedef struct ExpParser ExpParser;
+
 ExpParser *ExpParser_new(Logger *logger, DString *raw_txt);
-void ExpParser_parse(ExpParser* self);
-void ExpParser_free(ExpParser* self);
+
+ExpNode *ExpParser_parse(ExpParser *self);
+
+void ExpParser_free(ExpParser *self);
 
 #endif //NAHFPA_EXPPARSER_H

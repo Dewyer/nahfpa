@@ -31,4 +31,19 @@ add_executable(nahfpa
         src/logger/logger.h
         src/nahfpa_cli/NahfpaCli.c
         src/nahfpa_cli/NahfpaCli.h
-        src/utils/cassert.c src/utils/cassert.h src/utils/help_txt.h src/utils/help_txt.c src/utils/help_txt.h src/utils/test_script.c src/utils/test_script.h src/expression_parser/TokenSlice.c src/expression_parser/TokenSlice.h src/utils/symbols_helper.c src/utils/symbols_helper.h)
+        src/utils/cassert.c
+        src/utils/cassert.h
+        src/utils/help_txt.h
+        src/utils/help_txt.c
+        src/utils/help_txt.h
+        src/utils/test_script.c
+        src/utils/test_script.h
+        src/expression_parser/TokenSlice.c
+        src/expression_parser/TokenSlice.h
+        src/utils/symbols_helper.c
+        src/utils/symbols_helper.h
+        src/svg_factory/SvgFactory.c
+        src/svg_factory/SvgFactory.h
+        src/svg_file/SvgFile.c
+        src/svg_file/SvgFile.h
+        )

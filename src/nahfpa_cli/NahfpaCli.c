@@ -126,7 +126,7 @@ void NahfpaCli_compile(NahfpaCli *self)
 	DString *latex = DString_from_CString(TEST_SCRIPT);
 	ExpParser *parser = ExpParser_new(self->logger, latex);
 
-	ExpParser_parse(parser);
+	ExpNode *exp_tree_root = ExpParser_parse(parser);
 
 	ExpParser_free(parser);
 }
