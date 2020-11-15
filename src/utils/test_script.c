@@ -4,4 +4,4 @@
 
 #include "test_script.h"
 
-const char *TEST_SCRIPT = "^\\frac{10}{20} 100_";
+const char *TEST_SCRIPT = "^\\frac{10}{20} 100_{\\int + \\sqrt{a + b*c*d}}";

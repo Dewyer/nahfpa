@@ -8,6 +8,7 @@
 #include "data_structures/DString.h"
 #include "data_structures/List.h"
 #include "TokenSlice.h"
+#include "logger/logger.h"
 
 typedef enum ExpNodeType
 {

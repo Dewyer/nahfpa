@@ -4,6 +4,7 @@
 #include <utils/cassert.h>
 #include <utils/help_txt.h>
 #include <utils/test_script.h>
+#include <svg_factory/SvgFactory.h>
 #include "NahfpaCli.h"
 #include "data_structures/DString.h"
 #include "expression_parser/ExpParser.h"
@@ -127,7 +128,10 @@ void NahfpaCli_compile(NahfpaCli *self)
 	ExpParser *parser = ExpParser_new(self->logger, latex);
 
 	ExpNode *exp_tree_root = ExpParser_parse(parser);
+	SvgFactory *svg_factory = SvgFactory_new(self->logger, exp_tree_root, self->out_file_path);
 
+	ExpNode_free(exp_tree_root);
+	SvgFactory_free(svg_factory);
 	ExpParser_free(parser);
 }
 
