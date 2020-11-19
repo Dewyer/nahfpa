@@ -103,7 +103,7 @@ ListG(DString*) *ExpTokenizer_tokenize(const ExpTokenizer *self)
 
 		if (flush) {
 			flush_tokenizer(tokens, last_token_buffer);
-			last_token_buffer = DString_from_CString("");
+			last_token_buffer = DString_new();
 
 			if (!should_flush_now_set_now)
 				should_flush_next = false;
@@ -113,9 +113,7 @@ ListG(DString*) *ExpTokenizer_tokenize(const ExpTokenizer *self)
 		}
 	}
 
-	bool did_flush_last_token = flush_tokenizer(tokens, last_token_buffer);
-	if (!did_flush_last_token)
-		DString_free(last_token_buffer);
+	flush_tokenizer(tokens, last_token_buffer);
 
 	ListG(DString*) *escaped_tokens = ExpTokenizer_union_escape_sequences(tokens);
 	List_free_2D(tokens, (void (*)(void *)) DString_free);

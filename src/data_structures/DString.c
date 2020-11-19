@@ -18,8 +18,13 @@ void DString_resize(DString *self, size_t new_size)
 	char *new_ptr = (char *) calloc(new_size + 1, sizeof(*new_ptr));
 	assert(new_ptr && "DString couldn't alloc");
 
-	strcpy(new_ptr, self->data);
-	free(self->data);
+	if (self->data) {
+		strcpy(new_ptr, self->data);
+		free(self->data);
+	}
+	else
+		new_ptr[0] = '\0';
+
 	self->data = new_ptr;
 	self->capacity = new_size;
 }
@@ -69,7 +74,9 @@ void DString_add_char(DString *self, char chr)
 
 void DString_free(DString *self)
 {
-	free(self->data);
+	if (self->data)
+		free(self->data);
+
 	free(self);
 }
 

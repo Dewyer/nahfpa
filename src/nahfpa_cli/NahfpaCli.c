@@ -123,12 +123,43 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 	return CompileMode;
 }
 
+DString *NahfpaCli_read_input(NahfpaCli *self)
+{
+	Logger_log(self->logger,LogInfo , "Reading script input from: %s:", self->input_file_path ? self->input_file_path : "STDIN");
+	FILE *inp;
+	bool should_close_inp = false;
+	if (self->input_file_path)
+	{
+		inp = fopen(self->input_file_path, "r");
+		should_close_inp = true;
+
+		cassert(self->logger, inp != NULL, "Couldn't open input file to read.");
+	}
+	else
+		inp = stdin;
+
+	DString *full_input_string = DString_new();
+	char inp_char;
+	while (fscanf(inp, "%c", &inp_char) != EOF)
+	{
+		DString_add_char(full_input_string, inp_char);
+	}
+
+	if (should_close_inp)
+		fclose(inp);
+
+	const size_t read_len = DString_len(full_input_string);
+	Logger_log(self->logger, LogInfo, "Read %d characters", read_len);
+	cassert(self->logger, read_len > 0, "Input script needs to be longer than 0 characters.");
+
+	return full_input_string;
+}
+
 void NahfpaCli_compile(NahfpaCli *self)
 {
-	Logger_log(self->logger, LogError, "NAPFHA loaded...");
+	Logger_log(self->logger, LogInfo, "NAPFHA loaded...");
 
-	// FIXME Read from file or from the command line
-	DString *latex = DString_from_CString(TEST_SCRIPT);
+	DString *latex = NahfpaCli_read_input(self);
 	ExpParser *parser = ExpParser_new(self->logger, latex);
 
 	ExpNode *exp_tree_root = ExpParser_parse(parser);
