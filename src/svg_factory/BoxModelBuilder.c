@@ -3,6 +3,7 @@
 //
 
 #include <utils/rendering_constants.h>
+#include <utils/amf_text_width.h>
 #include "BoxModelBuilder.h"
 #include "BoxNode.h"
 #include "debugmalloc.h"
@@ -129,6 +130,18 @@ void BoxModelBuilder_build_prod_sum_box(BoxNode *box_node)
 	box_node->box.with = double_max(box_node->box.with, SUM_PROD_SIZE.with);
 }
 
+void BoxModelBuilder_build_literal_box(BoxNode *box_node)
+{
+	box_node->box.height = TEXT_HEIGHT + TEXT_CORRECTION;
+	box_node->box.with = 0;
+	const int length = DString_len(box_node->node->value);
+
+	for (int ii = 0; ii < length; ++ii) {
+		box_node->box.with += amf_text_width_calc(DString_char_at(box_node->node->value, ii), TEXT_HEIGHT);
+	}
+	box_node->box.with += length * LETTER_SPACING;
+}
+
 BoxNode *BoxModelBuilder_build_box_for_node(ExpNode *exp_node)
 {
 	BoxNode *box = BoxNode_new(exp_node);
@@ -137,8 +150,7 @@ BoxNode *BoxModelBuilder_build_box_for_node(ExpNode *exp_node)
 		box->box.with = TEXT_WIDTH;
 		box->box.height = TEXT_HEIGHT + TEXT_CORRECTION;
 	} else if (exp_node->type == Literal) {
-		box->box.height = TEXT_HEIGHT + TEXT_CORRECTION;
-		box->box.with = DString_len(exp_node->value) * TEXT_WIDTH;
+		BoxModelBuilder_build_literal_box(box);
 	} else if (exp_node->type == SuperScript) {
 		BoxModelBuilder_build_script_box(box, true);
 	} else if (exp_node->type == SubScript) {

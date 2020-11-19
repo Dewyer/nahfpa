@@ -140,7 +140,7 @@ DString *NahfpaCli_read_input(NahfpaCli *self)
 
 	DString *full_input_string = DString_new();
 	char inp_char;
-	while (fscanf(inp, "%c", &inp_char) != EOF)
+	while (fscanf(inp, "%c", &inp_char) != EOF && inp_char != '\n')
 	{
 		DString_add_char(full_input_string, inp_char);
 	}

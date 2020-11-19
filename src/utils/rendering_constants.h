@@ -17,5 +17,6 @@ extern const double TEXT_HEIGHT;
 extern const bool DEBUG_BOXES;
 extern const double TEXT_CORRECTION;
 extern const double TEXT_WIDTH;
+extern const double LETTER_SPACING;
 
 #endif //NAHFPA_RENDERING_CONSTANTS_H

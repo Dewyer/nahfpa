@@ -6,6 +6,7 @@
 #define NAHFPA_DSTRING_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct DString DString;
 
@@ -28,6 +29,10 @@ bool DString_eq_DString(const DString *string1, const DString *string2);
 void DString_free(DString *self);
 
 void DString_concat(DString *self, const DString *string2);
+
+void DString_concat_CString(DString *self, const char *string2);
+
+char DString_char_at(const DString *self, size_t ii);
 
 bool DString_starts_with(DString *self, char *string2);
 

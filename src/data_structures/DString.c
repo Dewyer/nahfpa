@@ -101,6 +101,18 @@ void DString_concat(DString *self, const DString *string2)
 	strcat(self->data, string2->data);
 }
 
+void DString_concat_CString(DString *self, const char *string2)
+{
+	DString_resize(self, self->capacity + strlen(string2));
+	strcat(self->data, string2);
+}
+
+char DString_char_at(const DString *self, size_t ii)
+{
+	assert((ii < (size_t)DString_len(self)) && "Out of bounds char index for DString");
+	return self->data[ii];
+}
+
 bool DString_starts_with(DString *self, char *string2)
 {
 	const size_t len = strlen(self->data);

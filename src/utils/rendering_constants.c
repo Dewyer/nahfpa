@@ -13,4 +13,4 @@ const double TEXT_HEIGHT = 30;
 const double TEXT_CORRECTION = 5.5;
 const double TEXT_WIDTH = 18;
 const bool DEBUG_BOXES = true;
-
+const double LETTER_SPACING = 1;
