@@ -80,7 +80,14 @@ void BoxModelBuilder_build_node_list_box(BoxNode *box_node)
 	for (size_t ii = 0; ii < box_node->node_list_box->item_count; ++ii) {
 		BoxNode *at_box = List_get(box_node->node_list_box, ii);
 
-		Box_vertical_center(&at_box->offset, &at_box->box, &box_node->box);
+		if (box_node->node->parent && box_node->node->parent->type == Frac) {
+			if (box_node->node->parent->arg1 == box_node->node)
+				Box_align_to_base_line(&at_box->offset, &at_box->box, &box_node->box);
+			else
+				at_box->offset.y = 0;
+		}
+		else
+			Box_vertical_center(&at_box->offset, &at_box->box, &box_node->box);
 	}
 
 	box_node->box.with -= gap;
@@ -92,18 +99,17 @@ void BoxModelBuilder_build_frac_box(BoxNode *box_node)
 
 	if (box_node->node->arg1) {
 		box_node->arg1_box = BoxModelBuilder_build_box_for_node(box_node->node->arg1);
-		box_node->box.height += box_node->arg1_box->box.height;
 	}
 
 	if (box_node->node->arg2) {
 		box_node->arg2_box = BoxModelBuilder_build_box_for_node(box_node->node->arg2);
-		box_node->box.height += box_node->arg2_box->box.height;
 	}
 
 	box_node->box.with = double_max(box_node->arg1_box ? box_node->arg1_box->box.with : 0,
 									box_node->arg2_box ? box_node->arg2_box->box.with : 0);
-	box_node->box.height += line_height;
 
+	box_node->box.height = line_height + 2*double_max(box_node->arg1_box ? box_node->arg1_box->box.height : 0,
+									  box_node->arg2_box ? box_node->arg2_box->box.height : 0);
 	if (box_node->arg1_box) {
 		Box_horizontal_center(&box_node->arg1_box->offset, &box_node->arg1_box->box, &box_node->box);
 	}

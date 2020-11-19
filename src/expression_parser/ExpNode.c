@@ -15,6 +15,7 @@ ExpNode *ExpNode_new(ExpNodeType type)
 	exp_node->value = NULL;
 	exp_node->origin = NULL;
 	exp_node->type = type;
+	exp_node->parent = NULL;
 
 	return exp_node;
 }

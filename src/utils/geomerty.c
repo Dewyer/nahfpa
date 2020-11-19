@@ -32,6 +32,11 @@ void Box_vertical_center(Vector *pos, const Size *box, const Size *container)
 	pos->y = container->height / 2 - box->height / 2;
 }
 
+void Box_align_to_base_line(Vector *pos, const Size *box, const Size *container)
+{
+	pos->y = container->height - box->height;
+}
+
 double double_max(double aa, double bb)
 {
 	return aa > bb ? aa : bb;

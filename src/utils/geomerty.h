@@ -25,6 +25,8 @@ void Box_horizontal_center(Vector *pos, const Size *box, const Size *container);
 
 void Box_vertical_center(Vector *pos, const Size *box, const Size *container);
 
+void Box_align_to_base_line(Vector *pos, const Size *box, const Size *container);
+
 void Vector_add_v(Vector *vector, const Vector *vector2);
 
 double double_max(double aa, double bb);
