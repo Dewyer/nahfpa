@@ -57,6 +57,18 @@ void SvgFactory_render_children(SvgFactory *self, BoxNode *node)
 		}
 }
 
+void SvgFactory_render_frac(SvgFactory *self, BoxNode *box_node)
+{
+	double delta_h = 0;
+	if (box_node->arg1_box)
+		delta_h += box_node->arg1_box->box.height + FRAC_LINE_HEIGHT / 2;
+
+	Vector p1 = {box_node->global_pos.x, box_node->global_pos.y + delta_h};
+	Vector p2 = {box_node->global_pos.x + box_node->box.with, box_node->global_pos.y + delta_h};
+
+	SvgFile_add_line(self->svg_file, &p1, &p2);
+}
+
 void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 {
 	if (DEBUG_BOXES)
@@ -76,14 +88,7 @@ void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 		DString_free(sub_ds);
 
 	} else if (box_node->node->type == Frac) {
-		double delta_h = 0;
-		if (box_node->arg1_box)
-			delta_h += box_node->arg1_box->box.height + FRAC_LINE_HEIGHT / 2;
-
-		Vector p1 = {box_node->global_pos.x, box_node->global_pos.y + delta_h};
-		Vector p2 = {box_node->global_pos.x + box_node->box.with, box_node->global_pos.y + delta_h};
-
-		SvgFile_add_line(self->svg_file, &p1, &p2);
+		SvgFactory_render_frac(self, box_node);
 	}
 }
 

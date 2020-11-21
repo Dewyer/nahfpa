@@ -6,10 +6,10 @@ set(CMAKE_C_STANDARD 99)
 if (MSVC)
     # warning level 4 and all warnings as errors
     add_compile_options(/W4 /WX)
-else()
+else ()
     # lots of warnings and all warnings as errors
     add_compile_options(-Wall -Wextra -pedantic -Werror)
-endif()
+endif ()
 
 SET(BASEPATH "${CMAKE_SOURCE_DIR}/src")
 INCLUDE_DIRECTORIES("${BASEPATH}")
@@ -54,5 +54,5 @@ add_executable(nahfpa
         src/utils/rendering_constants.h
         src/svg_factory/BoxModelBuilder.c
         src/svg_factory/BoxModelBuilder.h
-        src/utils/amf_text_width.c
-        src/utils/amf_text_width.h)
+        src/svg_factory/AmfTextWidth.h
+        src/svg_factory/AmfTextWidth.c)

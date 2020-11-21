@@ -21,8 +21,7 @@ void DString_resize(DString *self, size_t new_size)
 	if (self->data) {
 		strcpy(new_ptr, self->data);
 		free(self->data);
-	}
-	else
+	} else
 		new_ptr[0] = '\0';
 
 	self->data = new_ptr;
@@ -109,7 +108,7 @@ void DString_concat_CString(DString *self, const char *string2)
 
 char DString_char_at(const DString *self, size_t ii)
 {
-	assert((ii < (size_t)DString_len(self)) && "Out of bounds char index for DString");
+	assert((ii < (size_t) DString_len(self)) && "Out of bounds char index for DString");
 	return self->data[ii];
 }
 

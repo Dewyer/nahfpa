@@ -125,23 +125,21 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 
 DString *NahfpaCli_read_input(NahfpaCli *self)
 {
-	Logger_log(self->logger,LogInfo , "Reading script input from: %s:", self->input_file_path ? self->input_file_path : "STDIN");
+	Logger_log(self->logger, LogInfo, "Reading script input from: %s:",
+			   self->input_file_path ? self->input_file_path : "STDIN");
 	FILE *inp;
 	bool should_close_inp = false;
-	if (self->input_file_path)
-	{
+	if (self->input_file_path) {
 		inp = fopen(self->input_file_path, "r");
 		should_close_inp = true;
 
 		cassert(self->logger, inp != NULL, "Couldn't open input file to read.");
-	}
-	else
+	} else
 		inp = stdin;
 
 	DString *full_input_string = DString_new();
 	char inp_char;
-	while (fscanf(inp, "%c", &inp_char) != EOF && inp_char != '\n')
-	{
+	while (fscanf(inp, "%c", &inp_char) != EOF && inp_char != '\n') {
 		DString_add_char(full_input_string, inp_char);
 	}
 
