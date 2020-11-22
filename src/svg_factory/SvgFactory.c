@@ -69,9 +69,42 @@ void SvgFactory_render_frac(SvgFactory *self, BoxNode *box_node)
 		delta_h += box_node->arg1_box->box.height + FRAC_LINE_HEIGHT / 2;
 
 	Vector p1 = {box_node->global_pos.x, box_node->global_pos.y + delta_h};
-	Vector p2 = {box_node->global_pos.x + box_node->box.with, box_node->global_pos.y + delta_h};
+	Vector p2 = {box_node->global_pos.x + box_node->box.width, box_node->global_pos.y + delta_h};
 
 	SvgFile_add_line(self->svg_file, &p1, &p2);
+}
+
+void SvgFactory_render_sqrt(SvgFactory *self, BoxNode *box_node)
+{
+	const Vector *sqrt_off = &SQRT_BOX_DELTA;
+	const double height = box_node->box.height;
+	const double width = box_node->box.width;
+	double sqrt_uptick = height*0.25;
+	Vector tick_u;
+	Vector tick_d;
+	Vector up_s;
+	Vector end_s;
+
+	tick_u.y = height - sqrt_uptick;
+	tick_u.x = 0;
+
+	tick_d.y = height;
+	tick_d.x = sqrt_off->x/2.0;
+
+	up_s.y = sqrt_off->y / 2.0;
+	up_s.x = sqrt_off->x;
+
+	end_s.y = up_s.y;
+	end_s.x = width;
+
+	Vector_add_v(&tick_u, &box_node->global_pos);
+	Vector_add_v(&tick_d, &box_node->global_pos);
+	Vector_add_v(&up_s, &box_node->global_pos);
+	Vector_add_v(&end_s, &box_node->global_pos);
+
+	SvgFile_add_line(self->svg_file, &tick_u, &tick_d);
+	SvgFile_add_line(self->svg_file, &tick_d, &up_s);
+	SvgFile_add_line(self->svg_file, &up_s, &end_s);
 }
 
 void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
@@ -94,6 +127,8 @@ void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 
 	} else if (box_node->node->type == Frac) {
 		SvgFactory_render_frac(self, box_node);
+	} else if (box_node->node->type == Sqrt) {
+		SvgFactory_render_sqrt(self, box_node);
 	}
 }
 
@@ -101,7 +136,7 @@ void SvgFactory_create(SvgFactory *self)
 {
 	BoxNode *box_root = BoxModelBuilder_build(self->box_model_builder);
 	self->box_tree_root = box_root;
-	Logger_log(self->logger, LogInfo, "Box model dimensions: w: %f, h: %f", box_root->box.with, box_root->box.height);
+	Logger_log(self->logger, LogInfo, "Box model dimensions: w: %f, h: %f", box_root->box.width, box_root->box.height);
 	Logger_log(self->logger, LogInfo, "STEP 3. Box Model built");
 
 	FILE *file = fopen(self->out_file_path, "w");

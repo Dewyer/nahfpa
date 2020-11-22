@@ -6,13 +6,13 @@
 
 void Size_add_v(Size *size, const Vector *v)
 {
-	size->with += v->x;
+	size->width += v->x;
 	size->height += v->y;
 }
 
 void Size_add_s(Size *size, const Size *size2)
 {
-	size->with += size2->with;
+	size->width += size2->width;
 	size->height += size2->height;
 }
 
@@ -30,7 +30,7 @@ void Vector_negate(const Vector *vector, Vector *target)
 
 void Box_horizontal_center(Vector *pos, const Size *box, const Size *container)
 {
-	pos->x = container->with / 2 - box->with / 2;
+	pos->x = container->width / 2 - box->width / 2;
 }
 
 void Box_vertical_center(Vector *pos, const Size *box, const Size *container)

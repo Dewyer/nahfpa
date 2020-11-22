@@ -22,7 +22,7 @@ SvgFile *SvgFile_new(FILE *file, Size *view_port)
 	fprintf(file,
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<svg width=\"%f\" height=\"%f\" xmlns=\"http://www.w3.org/2000/svg\">\n"
 			"<style>%s</style>\n",
-			view_port->with, view_port->height, STYLE);
+			view_port->width, view_port->height, STYLE);
 	return self;
 }
 
@@ -67,7 +67,7 @@ void SvgFile_add_line(SvgFile *self, const Vector *p1, const Vector *p2)
 void SvgFile_add_box(SvgFile *self, const Vector *pp, const Size *size)
 {
 	fprintf(self->file, "\t<rect class=\"box\" x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" />\n", pp->x, pp->y,
-			size->with,
+			size->width,
 			size->height);
 }
 

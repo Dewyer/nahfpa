@@ -170,7 +170,7 @@ ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t comma
 		max_arg_c = 3;
  	} else if (DString_eq_CString(command, "\\#")) {
 		ExpNode *comment_node = ExpNode_new(Comment);
-		TokenSlice *comment_slice = ExpParser_get_command_argument_slice(self, command, true, command_start,
+		TokenSlice *comment_slice = ExpParser_get_command_argument_slice(self, command, true, command_start+1,
 																	  max_i);
 		comment_node->origin = TokenSlice_new(command_start, comment_slice->end);
 		TokenSlice_free(comment_slice);

@@ -13,7 +13,7 @@ typedef struct Vector
 
 typedef struct Size
 {
-	double with;
+	double width;
 	double height;
 } Size;
 

@@ -14,7 +14,7 @@ BoxNode *BoxNode_new(ExpNode *node)
 	self->offset.x = 0;
 	self->offset.y = 0;
 	self->box.height = 0;
-	self->box.with = 0;
+	self->box.width = 0;
 
 	self->arg1_box = NULL;
 	self->arg2_box = NULL;
