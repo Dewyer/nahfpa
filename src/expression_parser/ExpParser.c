@@ -73,7 +73,10 @@ bool token_is_a_command(DString *token)
 	return DString_eq_CString(token, "\\frac") ||
 		   DString_eq_CString(token, "\\sqrt") ||
 		   DString_eq_CString(token, "\\sum") ||
-		   DString_eq_CString(token, "\\prod");
+		   DString_eq_CString(token, "\\prod") ||
+		   DString_eq_CString(token, "\\#") ||
+		   DString_eq_CString(token, "\\lim") ||
+		   DString_eq_CString(token, "\\index");
 }
 
 bool token_is_sub_or_superscript(DString *token)
@@ -93,12 +96,16 @@ TokenSlice *
 ExpParser_parse_command_args(ExpParser *self, ExpNode *command, int required_args, int max_args, size_t args_start,
 							 size_t max_i)
 {
+	// FIXME Refactor to use an iterable
 	TokenSlice *arg1_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 1, args_start,
 																  max_i);
 	TokenSlice *arg2_slice = NULL;
+	TokenSlice *arg3_slice = NULL;
+
 	if (arg1_slice && max_args >= 2)
-		arg2_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 2, arg1_slice->end + 1,
-														  max_i);
+		arg2_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 2, arg1_slice->end + 1, max_i);
+	if (arg2_slice && max_args >= 3)
+		arg3_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 3, arg2_slice->end + 1, max_i);
 
 	if (arg1_slice) {
 		TokenSlice *real_sl1 = TokenSlice_shrink_clone(arg1_slice);
@@ -110,15 +117,24 @@ ExpParser_parse_command_args(ExpParser *self, ExpNode *command, int required_arg
 		command->arg2 = ExpParser_parse_node_list(self, real_sl2);
 		command->arg2->parent = command;
 	}
+	if (arg3_slice)
+	{
+		TokenSlice *real_sl3 = TokenSlice_shrink_clone(arg3_slice);
+		command->arg3 = ExpParser_parse_node_list(self, real_sl3);
+		command->arg3->parent = command;
+	}
 
-	TokenSlice *final_slice;
-	if (arg1_slice)
-		final_slice = TokenSlice_new(arg1_slice->start, arg2_slice ? arg2_slice->end : arg1_slice->end);
-	else
-		final_slice = TokenSlice_new(args_start, args_start);
+	TokenSlice *final_slice = TokenSlice_new(arg1_slice ?  arg1_slice->start : args_start, arg1_slice ? arg1_slice->end : args_start);
+	if (arg2_slice) {
+		final_slice->end = arg2_slice->end;
+		TokenSlice_free(arg2_slice);
+	}
+	if (arg3_slice) {
+		final_slice->end = arg3_slice->end;
+		TokenSlice_free(arg3_slice);
+	}
 
 	TokenSlice_free(arg1_slice);
-	TokenSlice_free(arg2_slice);
 	return final_slice;
 }
 
@@ -144,6 +160,22 @@ ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t comma
 		type = Prod;
 		required_arg_c = 0;
 		max_arg_c = 2;
+	} else if (DString_eq_CString(command, "\\lim")) {
+		type = Prod;
+		required_arg_c = 0;
+		max_arg_c = 2;
+	} else if (DString_eq_CString(command, "\\index")) {
+		type = Index;
+		required_arg_c = 1;
+		max_arg_c = 3;
+ 	} else if (DString_eq_CString(command, "\\#")) {
+		ExpNode *comment_node = ExpNode_new(Comment);
+		TokenSlice *comment_slice = ExpParser_get_command_argument_slice(self, command, true, command_start,
+																	  max_i);
+		comment_node->origin = TokenSlice_new(command_start, comment_slice->end);
+		TokenSlice_free(comment_slice);
+
+		return comment_node;
 	}
 
 	ExpNode *cmd_node = ExpNode_new(type);
@@ -167,7 +199,7 @@ ExpNode *ExpParser_parse_from_string(DString *str, size_t ii)
 
 ExpNode *ExpParser_parse_sub_or_superscript(DString *script_token, size_t script_i)
 {
-	ExpNode *node = ExpNode_new(DString_eq_CString(script_token, "^") ? SuperScript : SubScript);
+	ExpNode *node = ExpNode_new(Index);
 	node->value = DString_clone(script_token);
 	node->origin = TokenSlice_new(script_i, script_i);
 
@@ -210,7 +242,7 @@ void ExpParser_transform_node_list_for_scripts(ExpParser *self, ExpNode *node_li
 		ExpNode *at_node = List_get(node_list->node_list, ii);
 		if (ii < node_list->node_list->item_count - 1) {
 			ExpNode *next_node = List_get(node_list->node_list, ii + 1);
-			if (next_node->type == SubScript || next_node->type == SuperScript) {
+			if (next_node->type == Index && next_node->arg1 == NULL) {
 				skip = true;
 				next_node->arg1 = at_node;
 				next_node->origin->start = at_node->origin->start;
@@ -218,10 +250,13 @@ void ExpParser_transform_node_list_for_scripts(ExpParser *self, ExpNode *node_li
 		}
 		if (ii != 0) {
 			ExpNode *last_node = List_get(node_list->node_list, ii - 1);
-			if (last_node->type == SubScript || last_node->type == SuperScript) {
+			if (last_node->type == Index) {
 				skip = true;
-				last_node->arg2 = at_node;
 				last_node->origin->end = at_node->origin->end;
+				if (DString_eq_CString(last_node->value, "^") && last_node->arg2 == NULL)
+					last_node->arg2 = at_node;
+				else if (DString_eq_CString(last_node->value, "_") && last_node->arg3 == NULL)
+					last_node->arg3 = at_node;
 			}
 		}
 		if (!skip)
@@ -258,7 +293,10 @@ ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice)
 		}
 
 		at_node->parent = node;
-		List_push(node->node_list, at_node);
+		if (at_node->type != Comment)
+			List_push(node->node_list, at_node);
+		else
+			ExpNode_free(at_node);
 	}
 
 	ExpParser_transform_node_list_for_scripts(self, node);

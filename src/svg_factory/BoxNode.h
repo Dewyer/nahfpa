@@ -17,6 +17,7 @@ typedef struct BoxNode
 
 	struct BoxNode *arg1_box;
 	struct BoxNode *arg2_box;
+	struct BoxNode *arg3_box;
 	ListG(struct BoxNode) *node_list_box;
 
 	ExpNode *node;

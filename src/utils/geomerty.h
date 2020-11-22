@@ -29,6 +29,8 @@ void Box_align_to_base_line(Vector *pos, const Size *box, const Size *container)
 
 void Vector_add_v(Vector *vector, const Vector *vector2);
 
+void Vector_negate(const Vector *vector, Vector *target);
+
 double double_max(double aa, double bb);
 
 #endif //NAHFPA_GEOMERTY_H

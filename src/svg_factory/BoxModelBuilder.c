@@ -3,6 +3,7 @@
 //
 
 #include <utils/rendering_constants.h>
+#include <utils/cassert.h>
 #include "BoxModelBuilder.h"
 #include "BoxNode.h"
 #include "debugmalloc.h"
@@ -32,9 +33,14 @@ void BoxModelBuilder_free(BoxModelBuilder *self)
 
 BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_node);
 
-void BoxModelBuilder_build_script_box(BoxModelBuilder *self, BoxNode *box_node, bool is_super)
+void BoxModelBuilder_build_index_box(BoxModelBuilder *self, BoxNode *box_node)
 {
+	cassert(self->logger, box_node->node->arg1 != NULL, "Index needs a first argument");
 	const Vector *delta = &SCRIPT_BOX_DELTA;
+	Vector neg_delta;
+	Vector_negate(delta, &neg_delta);
+	double arg2_width = 0;
+	double arg3_width = 0;
 
 	if (box_node->node->arg1)
 		box_node->arg1_box = BoxModelBuilder_build_box_for_node(self, box_node->node->arg1);
@@ -42,23 +48,27 @@ void BoxModelBuilder_build_script_box(BoxModelBuilder *self, BoxNode *box_node, 
 	if (box_node->node->arg2)
 		box_node->arg2_box = BoxModelBuilder_build_box_for_node(self, box_node->node->arg2);
 
-	if (box_node->arg1_box) {
-		if (is_super)
-			box_node->arg1_box->offset.y = box_node->arg2_box ? box_node->arg2_box->box.height + delta->y : 0;
+	if (box_node->node->arg3)
+		box_node->arg3_box = BoxModelBuilder_build_box_for_node(self, box_node->node->arg3);
 
-		Size_add_s(&box_node->box, &box_node->arg1_box->box);
-	}
-	if (box_node->arg1_box && box_node->arg2_box) {
-		box_node->arg2_box->offset.x = box_node->arg1_box->box.with + delta->x;
 
-		Size_add_v(&box_node->box, delta);
+	double arg_offset = box_node->arg1_box->box.with + delta->x;
+	if (box_node->arg2_box)
+	{
+		box_node->box.height += box_node->arg2_box->box.height + neg_delta.y;
+		box_node->arg1_box->offset.y = box_node->arg2_box->box.height + neg_delta.y;
+		box_node->arg2_box->offset.x = arg_offset;
+		arg2_width = box_node->arg2_box->box.with;
 	}
-	if (box_node->arg2_box) {
-		if (!is_super)
-			box_node->arg2_box->offset.y = box_node->arg1_box ? box_node->arg1_box->box.height + delta->y : 0;
-
-		Size_add_s(&box_node->box, &box_node->arg2_box->box);
+	if (box_node->arg3_box)
+	{
+		box_node->box.height += box_node->arg3_box->box.height + neg_delta.y;
+		box_node->arg3_box->offset.x = arg_offset;
+		box_node->arg3_box->offset.y = box_node->arg1_box->offset.y + box_node->arg1_box->box.height + neg_delta.y;
+		arg3_width = box_node->arg3_box->box.with;
 	}
+	box_node->box.with = arg_offset + double_max(arg2_width, arg3_width);
+	box_node->box.height += box_node->arg1_box->box.height;
 }
 
 void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_node)
@@ -159,10 +169,8 @@ BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_
 		box->box.height = TEXT_HEIGHT + TEXT_CORRECTION;
 	} else if (exp_node->type == Literal) {
 		BoxModelBuilder_build_literal_box(self, box);
-	} else if (exp_node->type == SuperScript) {
-		BoxModelBuilder_build_script_box(self, box, true);
-	} else if (exp_node->type == SubScript) {
-		BoxModelBuilder_build_script_box(self, box, false);
+	} else if (exp_node->type == Index) {
+		BoxModelBuilder_build_index_box(self, box);
 	} else if (exp_node->type == NodeList) {
 		BoxModelBuilder_build_node_list_box(self, box);
 	} else if (exp_node->type == Frac) {

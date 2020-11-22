@@ -12,15 +12,16 @@
 
 typedef enum ExpNodeType
 {
-	SuperScript,
-	SubScript,
+	Index,
 	NodeList,
 	Symbol,
 	Literal,
 	Frac,
 	Sqrt,
 	Sum,
-	Prod
+	Prod,
+	Lim,
+	Comment
 
 } ExpNodeType;
 
@@ -29,6 +30,7 @@ typedef struct ExpNode
 	ExpNodeType type;
 	struct ExpNode *arg1;
 	struct ExpNode *arg2;
+	struct ExpNode *arg3;
 	ListG(struct ExpNode) *node_list;
 	DString *value;
 	TokenSlice *origin;

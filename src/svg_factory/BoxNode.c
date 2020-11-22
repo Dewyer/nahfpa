@@ -18,6 +18,7 @@ BoxNode *BoxNode_new(ExpNode *node)
 
 	self->arg1_box = NULL;
 	self->arg2_box = NULL;
+	self->arg3_box = NULL;
 	self->node_list_box = NULL;
 
 	return self;
@@ -35,6 +36,8 @@ void BoxNode_free(BoxNode *self)
 		BoxNode_free(self->arg1_box);
 	if (self->arg2_box)
 		BoxNode_free(self->arg2_box);
+	if (self->arg3_box)
+		BoxNode_free(self->arg3_box);
 	if (self->node_list_box)
 		List_free_2D(self->node_list_box, (void (*)(void *)) BoxNode_free);
 

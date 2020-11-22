@@ -22,6 +22,12 @@ void Vector_add_v(Vector *vector, const Vector *v2)
 	vector->y += v2->y;
 }
 
+void Vector_negate(const Vector *vector, Vector *target)
+{
+	target->x = -vector->x;
+	target->y = -vector->y;
+}
+
 void Box_horizontal_center(Vector *pos, const Size *box, const Size *container)
 {
 	pos->x = container->with / 2 - box->with / 2;

@@ -12,6 +12,7 @@ ExpNode *ExpNode_new(ExpNodeType type)
 	exp_node->node_list = NULL;
 	exp_node->arg1 = NULL;
 	exp_node->arg2 = NULL;
+	exp_node->arg3 = NULL;
 	exp_node->value = NULL;
 	exp_node->origin = NULL;
 	exp_node->type = type;
@@ -43,10 +44,8 @@ char *type_to_string(ExpNodeType type)
 			return "SUM";
 		case Prod:
 			return "PROD";
-		case SuperScript:
-			return "SUPER_SCRIPT";
-		case SubScript:
-			return "SUB_SCRIPT";
+		case Index:
+			return "INDEX";
 		case NodeList:
 			return "NODE_LIST";
 		case Symbol:
@@ -72,6 +71,10 @@ void ExpNode_log_with_lvl(const ExpNode *self, Logger *logger, int lvl)
 	if (self->arg2) {
 		Logger_log(logger, LogInfo, "%s-ARG2:", prefix);
 		ExpNode_log_with_lvl(self->arg2, logger, lvl + 1);
+	}
+	if (self->arg3) {
+		Logger_log(logger, LogInfo, "%s-ARG3:", prefix);
+		ExpNode_log_with_lvl(self->arg3, logger, lvl + 1);
 	}
 
 	if (self->node_list) {
@@ -104,6 +107,9 @@ void ExpNode_free(ExpNode *self)
 
 	if (self->arg2)
 		ExpNode_free(self->arg2);
+
+	if (self->arg3)
+		ExpNode_free(self->arg3);
 
 	if (self->origin)
 		TokenSlice_free(self->origin);

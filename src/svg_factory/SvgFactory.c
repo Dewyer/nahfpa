@@ -48,6 +48,11 @@ void SvgFactory_render_children(SvgFactory *self, BoxNode *node)
 		SvgFactory_render_node(self, node->arg2_box);
 	}
 
+	if (node->arg3_box) {
+		BoxNode_calc_global_position(node->arg3_box, node);
+		SvgFactory_render_node(self, node->arg3_box);
+	}
+
 	if (node->node_list_box)
 		for (size_t ii = 0; ii < node->node_list_box->item_count; ++ii) {
 			BoxNode *at_box_node = List_get(node->node_list_box, ii);
