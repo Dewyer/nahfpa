@@ -151,7 +151,7 @@ ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t comma
 	} else if (DString_eq_CString(command, "\\sqrt")) {
 		type = Sqrt;
 		required_arg_c = 1;
-		max_arg_c = 1;
+		max_arg_c = 2;
 	} else if (DString_eq_CString(command, "\\sum")) {
 		type = Sum;
 		required_arg_c = 0;
@@ -161,9 +161,9 @@ ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t comma
 		required_arg_c = 0;
 		max_arg_c = 2;
 	} else if (DString_eq_CString(command, "\\lim")) {
-		type = Prod;
+		type = Lim;
 		required_arg_c = 0;
-		max_arg_c = 2;
+		max_arg_c = 1;
 	} else if (DString_eq_CString(command, "\\index")) {
 		type = Index;
 		required_arg_c = 1;

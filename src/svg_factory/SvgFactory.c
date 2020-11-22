@@ -79,7 +79,7 @@ void SvgFactory_render_sqrt(SvgFactory *self, BoxNode *box_node)
 	const Vector *sqrt_off = &SQRT_BOX_DELTA;
 	const double height = box_node->box.height;
 	const double width = box_node->box.width;
-	double sqrt_uptick = height*0.25;
+	double sqrt_uptick = height * SQRT_TICK_HEIGHT_RATIO;
 	Vector tick_u;
 	Vector tick_d;
 	Vector up_s;

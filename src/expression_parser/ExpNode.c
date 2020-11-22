@@ -52,6 +52,8 @@ char *type_to_string(ExpNodeType type)
 			return "SYMBOL";
 		case Literal:
 			return "LITERAL";
+		case Lim:
+			return "LIM";
 		default:
 			return "UNKNOWN";
 	}
