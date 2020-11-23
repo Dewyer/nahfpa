@@ -89,7 +89,7 @@ void SvgFactory_render_sqrt(SvgFactory *self, BoxNode *box_node)
 	tick_u.x = 0;
 
 	tick_d.y = height;
-	tick_d.x = sqrt_off->x/2.0;
+	tick_d.x = sqrt_off->x / 2.0;
 
 	up_s.y = sqrt_off->y / 2.0;
 	up_s.x = sqrt_off->x;
@@ -105,6 +105,40 @@ void SvgFactory_render_sqrt(SvgFactory *self, BoxNode *box_node)
 	SvgFile_add_line(self->svg_file, &tick_u, &tick_d);
 	SvgFile_add_line(self->svg_file, &tick_d, &up_s);
 	SvgFile_add_line(self->svg_file, &up_s, &end_s);
+}
+
+void SvgFactory_render_sum_prod(SvgFactory *self, BoxNode *box_node)
+{
+	BoxNode *upper = box_node->arg1_box;
+	DString *text_sub = NULL;
+	Vector text_pos;
+	const Size *mid_size = box_node->node->type == Sum ? &SUM_SIZE : &PROD_SIZE;
+
+	if (upper)
+		text_pos.y = upper->box.height + SUM_PROD_PADDING;
+
+	Box_horizontal_center(&text_pos, mid_size, &box_node->box);
+
+	if (box_node->node->type == Sum)
+		text_sub = DString_from_CString("∑");
+	else if (box_node->node->type == Prod)
+		text_sub = DString_from_CString("∏");
+
+	SvgFile_add_text(self->svg_file, text_sub, &text_pos);
+
+	if (text_sub)
+		DString_free(text_sub);
+}
+
+void SvgFactory_render_lim(SvgFactory *self, BoxNode *box_node)
+{
+	Vector pos;
+	pos.y = 0;
+	Box_horizontal_center(&pos, &LIM_SIZE, &box_node->box);
+
+	DString *lim = DString_from_CString("lim");
+	SvgFile_add_text(self->svg_file, lim, &pos);
+	DString_free(lim);
 }
 
 void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
@@ -129,6 +163,10 @@ void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 		SvgFactory_render_frac(self, box_node);
 	} else if (box_node->node->type == Sqrt) {
 		SvgFactory_render_sqrt(self, box_node);
+	} else if (box_node->node->type == Sum || box_node->node->type == Prod) {
+		SvgFactory_render_sum_prod(self, box_node);
+	} else if (box_node->node->type == Lim) {
+		SvgFactory_render_lim(self, box_node);
 	}
 }
 
