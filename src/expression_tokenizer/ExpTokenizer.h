@@ -9,9 +9,11 @@
 
 typedef struct ExpTokenizer ExpTokenizer;
 
-ExpTokenizer *ExpTokenizer_new(DString *raw_txt);
+ExpTokenizer *ExpTokenizer_new(Logger *logger,DString *raw_txt);
 
-List *ExpTokenizer_tokenize(const ExpTokenizer *self);
+List *ExpTokenizer_tokenize(ExpTokenizer *self);
+
+DString *ExpTokenizer_get_token_substring(ExpTokenizer *self, size_t start, size_t end);
 
 void ExpTokenizer_free(ExpTokenizer *self);
 

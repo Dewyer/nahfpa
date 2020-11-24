@@ -324,7 +324,7 @@ void ExpParser_tokenize(ExpParser *self)
 	Logger_log(self->logger, LogInfo, "STEP 1. : Tokenizer");
 	Logger_log(self->logger, LogInfo, "INPUT: %s", DString_to_CString(self->raw_txt));
 
-	ExpTokenizer *tokenizer = ExpTokenizer_new(DString_clone(self->raw_txt));
+	ExpTokenizer *tokenizer = ExpTokenizer_new(self->logger ,DString_clone(self->raw_txt));
 	ListG(DString*) *tokens = ExpTokenizer_tokenize(tokenizer);
 
 	Logger_log(self->logger, LogInfo, "Tokenization successfull");
