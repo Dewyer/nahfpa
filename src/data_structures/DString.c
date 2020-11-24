@@ -56,7 +56,7 @@ char *DString_to_CString(const DString *self)
 	return self->data;
 }
 
-int DString_len(const DString *self)
+size_t DString_len(const DString *self)
 {
 	if (self->data)
 		return (int) strlen(self->data);
@@ -128,4 +128,19 @@ bool DString_starts_with(DString *self, char *string2)
 	}
 
 	return true;
+}
+
+DString *DString_substring(const DString *self, size_t start, size_t end)
+{
+	assert((start < end) && "DString substring start over end");
+	assert((end < DString_len(self)) && "DString substring end over end of string");
+
+	DString *new_string = DString_new();
+	size_t copy_len = end - start + 1;
+	DString_resize(new_string, copy_len);
+
+	strncpy(new_string->data, self->data + start, copy_len);
+	new_string->data[copy_len] = '\0';
+
+	return new_string;
 }

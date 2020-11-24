@@ -15,7 +15,7 @@ struct ExpParser
 {
 	Logger *logger;
 
-	DString *raw_txt;
+	ExpTokenizer *tokenizer;
 	ListG(DString*) *tokens;
 };
 
@@ -23,7 +23,8 @@ ExpParser *ExpParser_new(Logger *logger, DString *raw_txt)
 {
 	ExpParser *exp = (ExpParser *) malloc(sizeof(*exp));
 	exp->logger = logger;
-	exp->raw_txt = raw_txt;
+	exp->tokenizer = ExpTokenizer_new(logger, raw_txt);
+
 	return exp;
 }
 
@@ -76,7 +77,8 @@ bool token_is_a_command(DString *token)
 		   DString_eq_CString(token, "\\prod") ||
 		   DString_eq_CString(token, "\\#") ||
 		   DString_eq_CString(token, "\\lim") ||
-		   DString_eq_CString(token, "\\index");
+		   DString_eq_CString(token, "\\index") ||
+		   DString_eq_CString(token, "\\text");
 }
 
 bool token_is_sub_or_superscript(DString *token)
@@ -176,6 +178,16 @@ ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t comma
 		TokenSlice_free(comment_slice);
 
 		return comment_node;
+	} else if (DString_eq_CString(command, "\\text"))
+	{
+		ExpNode *text_node = ExpNode_new(Literal);
+		TokenSlice *text_slice = ExpParser_get_command_argument_slice(self, command, true, command_start+1,
+																		 max_i);
+		text_node->value = ExpTokenizer_get_token_substring(self->tokenizer, text_slice->start, text_slice->end-1);
+		text_node->origin = TokenSlice_new(command_start, text_slice->end);
+		TokenSlice_free(text_slice);
+
+		return text_node;
 	}
 
 	ExpNode *cmd_node = ExpNode_new(type);
@@ -322,10 +334,9 @@ ExpNode *ExpParser_do_parse(ExpParser *self)
 void ExpParser_tokenize(ExpParser *self)
 {
 	Logger_log(self->logger, LogInfo, "STEP 1. : Tokenizer");
-	Logger_log(self->logger, LogInfo, "INPUT: %s", DString_to_CString(self->raw_txt));
+	Logger_log(self->logger, LogInfo, "INPUT: %s", DString_to_CString(ExpTokenizer_get_raw_txt(self->tokenizer)));
 
-	ExpTokenizer *tokenizer = ExpTokenizer_new(self->logger ,DString_clone(self->raw_txt));
-	ListG(DString*) *tokens = ExpTokenizer_tokenize(tokenizer);
+	ListG(DString*) *tokens = ExpTokenizer_tokenize(self->tokenizer);
 
 	Logger_log(self->logger, LogInfo, "Tokenization successfull");
 
@@ -335,8 +346,6 @@ void ExpParser_tokenize(ExpParser *self)
 	}
 	Logger_log(self->logger, LogInfo, "STEP 1. Tokenization FINISHED!");
 	self->tokens = tokens;
-
-	ExpTokenizer_free(tokenizer);
 }
 
 ExpNode *ExpParser_parse(ExpParser *self)
@@ -347,8 +356,8 @@ ExpNode *ExpParser_parse(ExpParser *self)
 
 void ExpParser_free(ExpParser *self)
 {
-	DString_free(self->raw_txt);
 	List_free_2D(self->tokens, (void (*)(void *)) DString_free);
+	ExpTokenizer_free(self->tokenizer);
 
 	free(self);
 }

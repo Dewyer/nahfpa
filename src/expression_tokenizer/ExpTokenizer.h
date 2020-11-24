@@ -17,4 +17,6 @@ DString *ExpTokenizer_get_token_substring(ExpTokenizer *self, size_t start, size
 
 void ExpTokenizer_free(ExpTokenizer *self);
 
+const DString *ExpTokenizer_get_raw_txt(const ExpTokenizer *self);
+
 #endif //NAHFPA_EXPTOKENIZER_H

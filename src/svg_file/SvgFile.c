@@ -30,7 +30,7 @@ DString *SvgFile_escape_text(const DString *txt)
 {
 	DString *new_str = DString_new();
 
-	for (int ii = 0; ii < DString_len(txt); ++ii) {
+	for (size_t ii = 0; ii < DString_len(txt); ++ii) {
 		if (DString_char_at(txt, ii) == '&')
 			DString_concat_CString(new_str, "&amp;");
 		else if (DString_char_at(txt, ii) == '<')

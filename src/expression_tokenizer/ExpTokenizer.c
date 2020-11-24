@@ -18,7 +18,7 @@ struct ExpTokenizer
 
 ExpTokenizer *ExpTokenizer_new(Logger *logger,DString *raw_txt)
 {
-	ExpTokenizer *exp = (ExpTokenizer *) malloc(sizeof(exp));
+	ExpTokenizer *exp = (ExpTokenizer *) malloc(sizeof(*exp));
 	exp->logger = logger;
 	exp->raw_txt = raw_txt;
 	exp->token_to_text_i = List_new();
@@ -145,9 +145,19 @@ ListG(DString*) *ExpTokenizer_tokenize(ExpTokenizer *self)
 
 DString *ExpTokenizer_get_token_substring(ExpTokenizer *self, size_t start, size_t end)
 {
-	cassert(self->logger, end < self->tokens->item_count, "Token substring end over token length");
+	cassert(self->logger, start < end, "Token substring start over end");
+	cassert(self->logger, end < self->tokens->item_count-1, "Token substring end over token length");
+
 	size_t *str_start_i = List_get(self->token_to_text_i, start);
-	size_t *str_end_i = List_get(self->token_to_text_i, end);
+	size_t str_end_i;
+	if (end == self->tokens->item_count-1)
+		str_end_i = DString_len(self->raw_txt)-1;
+	else{
+		size_t *end_ptr = List_get(self->token_to_text_i, end + 1);
+		str_end_i = *end_ptr - 1;
+	}
+
+	return DString_substring(self->raw_txt, *str_start_i, str_end_i);
 }
 
 void ExpTokenizer_free(ExpTokenizer *self)
@@ -155,4 +165,9 @@ void ExpTokenizer_free(ExpTokenizer *self)
 	DString_free(self->raw_txt);
 	List_free_2D(self->token_to_text_i, (void (*)(void *)) size_t_free);
 	free(self);
+}
+
+const DString *ExpTokenizer_get_raw_txt(const ExpTokenizer *self)
+{
+	return self->raw_txt;
 }

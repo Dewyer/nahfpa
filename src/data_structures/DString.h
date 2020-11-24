@@ -18,7 +18,7 @@ DString *DString_from_CString(const char *str);
 
 char *DString_to_CString(const DString *self);
 
-int DString_len(const DString *self);
+size_t DString_len(const DString *self);
 
 void DString_add_char(DString *self, char chr);
 
@@ -35,5 +35,7 @@ void DString_concat_CString(DString *self, const char *string2);
 char DString_char_at(const DString *self, size_t ii);
 
 bool DString_starts_with(DString *self, char *string2);
+
+DString *DString_substring(const DString *self, size_t start, size_t end);
 
 #endif //NAHFPA_DSTRING_H

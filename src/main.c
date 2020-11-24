@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <nahfpa_cli/NahfpaCli.h>
 #include "debugmalloc.h"
 
