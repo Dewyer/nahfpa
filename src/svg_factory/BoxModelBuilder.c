@@ -4,6 +4,7 @@
 
 #include <utils/rendering_constants.h>
 #include <utils/cassert.h>
+#include <utils/symbols_helper.h>
 #include "BoxModelBuilder.h"
 #include "BoxNode.h"
 #include "debugmalloc.h"
@@ -188,13 +189,18 @@ void BoxModelBuilder_build_literal_box(BoxModelBuilder *self, BoxNode *box_node)
 	box_node->box.width += length * LETTER_SPACING;
 }
 
+void BoxModelBuilder_build_symbol_box(BoxNode *box_node)
+{
+	SymbolDefinitionFindResults def = SymbolDefinition_get_supported_results(box_node->node->value);
+	box_node->box = def.is_uppercase ? def.definition->box_uppercase : def.definition->box;
+}
+
 BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_node)
 {
 	BoxNode *box = BoxNode_new(exp_node);
 
 	if (exp_node->type == Symbol) {
-		box->box.width = TEXT_WIDTH;
-		box->box.height = TEXT_HEIGHT + TEXT_CORRECTION;
+		BoxModelBuilder_build_symbol_box(box);
 	} else if (exp_node->type == Literal) {
 		BoxModelBuilder_build_literal_box(self, box);
 	} else if (exp_node->type == Index) {

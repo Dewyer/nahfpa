@@ -7,15 +7,15 @@
 
 #include <stdbool.h>
 #include <data_structures/DString.h>
-
-#define SUPPORTED_SYMBOL_COUNT 3
-
+#include "geomerty.h"
 
 typedef struct SymbolDefinition
 {
 	char *command;
 	char *substitution;
 	char *uppercase_substitution;
+	Size box;
+	Size box_uppercase;
 } SymbolDefinition;
 
 typedef struct SymbolDefinitionFindResults
@@ -25,7 +25,7 @@ typedef struct SymbolDefinitionFindResults
 	bool is_uppercase;
 } SymbolDefinitionFindResults;
 
-extern const SymbolDefinition SUPPORTED_SYMBOLS[SUPPORTED_SYMBOL_COUNT];
+extern const SymbolDefinition SUPPORTED_SYMBOLS[];
 
 SymbolDefinitionFindResults SymbolDefinition_get_supported_results(DString *command);
 

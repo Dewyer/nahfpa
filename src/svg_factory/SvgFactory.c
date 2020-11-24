@@ -141,6 +141,19 @@ void SvgFactory_render_lim(SvgFactory *self, BoxNode *box_node)
 	DString_free(lim);
 }
 
+void SvgFactory_render_symbol(SvgFactory *self, BoxNode *box_node)
+{
+	SymbolDefinitionFindResults sym_res = SymbolDefinition_get_supported_results(box_node->node->value);
+	const char *sub = sym_res.is_uppercase ? sym_res.definition->uppercase_substitution
+										   : sym_res.definition->substitution;
+
+	DString *sub_ds = DString_from_CString(sub);
+	Vector pos = box_node->global_pos;
+	pos.y += TEXT_CORRECTION;
+	SvgFile_add_text(self->svg_file, sub_ds, &pos);
+	DString_free(sub_ds);
+}
+
 void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 {
 	if (DEBUG_BOXES)
@@ -151,14 +164,7 @@ void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 	if (box_node->node->type == Literal) {
 		SvgFile_add_text(self->svg_file, box_node->node->value, &box_node->global_pos);
 	} else if (box_node->node->type == Symbol) {
-		SymbolDefinitionFindResults sym_res = SymbolDefinition_get_supported_results(box_node->node->value);
-		const char *sub = sym_res.is_uppercase ? sym_res.definition->uppercase_substitution
-											   : sym_res.definition->substitution;
-
-		DString *sub_ds = DString_from_CString(sub);
-		SvgFile_add_text(self->svg_file, sub_ds, &box_node->global_pos);
-		DString_free(sub_ds);
-
+		SvgFactory_render_symbol(self, box_node);
 	} else if (box_node->node->type == Frac) {
 		SvgFactory_render_frac(self, box_node);
 	} else if (box_node->node->type == Sqrt) {
