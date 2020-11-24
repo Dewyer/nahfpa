@@ -38,7 +38,7 @@ const SymbolDefinition SUPPORTED_SYMBOLS[] = {
 		{"\\sim",  "~", NULL, {19, 35},{0,0}},
 		{"\\to",  "→", NULL, {33, 35},{0,0}},
 		{"\\gets",  "←", NULL, {33, 35},{0,0}},
-		{"\\cdot",  "⋅", NULL, {19, 35},{0,0}},
+		{"\\cdot",  "⋅", NULL, {11, 35},{0,0}},
 		{"\\dots",  "…", NULL, {33, 35},{0,0}},
 		{"\\exists",  "∃", NULL, {19, 35},{0,0}},
 		{"\\forall",  "∀", NULL, {19, 35},{0,0}},

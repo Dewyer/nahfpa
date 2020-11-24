@@ -135,6 +135,7 @@ void SvgFactory_render_lim(SvgFactory *self, BoxNode *box_node)
 	Vector pos;
 	pos.y = 0;
 	Box_horizontal_center(&pos, &LIM_SIZE, &box_node->box);
+	Vector_add_v(&pos, &box_node->global_pos);
 
 	DString *lim = DString_from_CString("lim");
 	SvgFile_add_text(self->svg_file, lim, &pos);
@@ -149,7 +150,7 @@ void SvgFactory_render_symbol(SvgFactory *self, BoxNode *box_node)
 
 	DString *sub_ds = DString_from_CString(sub);
 	Vector pos = box_node->global_pos;
-	pos.y += TEXT_CORRECTION;
+	pos.y = 0;
 	SvgFile_add_text(self->svg_file, sub_ds, &pos);
 	DString_free(sub_ds);
 }

@@ -52,7 +52,7 @@ void SvgFile_add_text(SvgFile *self, const DString *text, const Vector *pos)
 {
 	DString *escp_txt = SvgFile_escape_text(text);
 	fprintf(self->file, "\t<text class=\"text\" x=\"%f\" y=\"%f\">%s</text>\n", pos->x,
-			pos->y + TEXT_HEIGHT - TEXT_CORRECTION,
+			pos->y + TEXT_HEIGHT,
 			DString_to_CString(escp_txt));
 
 	DString_free(escp_txt);
