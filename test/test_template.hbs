@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>NAHFPA Test suite results</title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+
+    <link rel="stylesheet" href="css/styles.css?v=1.0">
+    <style>
+        body
+        {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 1.1rem;
+        }
+
+        *
+        {
+            box-sizing: border-box;
+        }
+
+        .test
+        {
+            display: flex;
+            flex-direction: column;
+            background-color: aliceblue;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        .test > h2
+        {
+            margin: 0;
+            margin-bottom: 1rem;
+        }
+
+        .success, .fail
+        {
+            color: green;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .fail
+        {
+            color: red;
+        }
+
+        .svg
+        {
+            border: 2px solid black;
+        }
+
+        .no
+        {
+            color: orange;
+            font-weight: italic;
+        }
+
+        pre {
+            background: darkslategray;
+            border: 1px solid #ddd;
+            border-left: 5px solid orange;
+            color: white;
+            page-break-inside: avoid;
+            font-family: monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 1.6em;
+            max-width: 100%;
+            overflow: auto;
+            padding: 1em 1.5em;
+            display: block;
+            word-wrap: break-word;
+        }
+
+    </style>
+    <script type="text/javascript">
+        function toggle_visibility(id)
+        {
+            var e = document.getElementById(id);
+            if (e.style.display == 'block')
+                e.style.display = 'none';
+            else
+                e.style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <h1>NAHFPA Test Suite</h1>
+    {{#each tests}}
+        <div class="test">
+            <h2> <span class="no">{{this.no}}</span> {{this.title}}
+                {{#if this.testResultSuccess}}
+                <span class="success">SUCCESS</span>
+                {{else}}
+                <span class="fail">FAIL</span>
+                {{/if}}
+            </h2>
+            <p>{{this.description}}</p>
+            <pre>{{this.script}}</pre>
+            {{#if this.result}}
+                <img style="width: {{this.width}}px; height: {{this.height}}px;" class="svg" src="{{this.result}}" />
+            {{else}}
+                <span class="fail">FAIL</span>
+            {{/if}}
+            <a style="margin-top: 1rem;" href="#" onclick="toggle_visibility('{{this.title}}-out');">Show output</a>
+            <pre style="display: none;" id="{{this.title}}-out">{{this.out}}</pre>
+
+        </div>
+    {{/each}}
+</body>
+</html>

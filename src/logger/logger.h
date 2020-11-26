@@ -6,6 +6,7 @@
 #define NAHFPA_LOGGER_H
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdarg.h>
 
 typedef enum LogLevel
@@ -15,7 +16,7 @@ typedef enum LogLevel
 
 typedef struct Logger Logger;
 
-Logger *Logger_new(LogLevel min_level, char *out_path);
+Logger *Logger_new(LogLevel min_level, char *out_path, bool use_color);
 
 void Logger_free(Logger *self);
 

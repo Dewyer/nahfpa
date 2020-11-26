@@ -17,7 +17,7 @@ struct Logger
 	bool use_color;
 };
 
-Logger *Logger_new(LogLevel min_level, char *out_path)
+Logger *Logger_new(LogLevel min_level, char *out_path, bool use_color)
 {
 	Logger *self = (Logger *) malloc(sizeof(*self));
 
@@ -30,7 +30,7 @@ Logger *Logger_new(LogLevel min_level, char *out_path)
 		self->should_free_out_file = true;
 	} else {
 		self->out_file = stdout;
-		self->use_color = true;
+		self->use_color = use_color;
 		self->should_free_out_file = false;
 	}
 

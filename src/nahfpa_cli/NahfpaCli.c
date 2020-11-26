@@ -23,6 +23,7 @@ struct NahfpaCli
 	char *input_file_path;
 	char *out_file_path;
 	char *log_file_path;
+	char *need_color;
 	LogLevel min_log_level;
 
 	Logger *pre_logger;
@@ -39,9 +40,10 @@ NahfpaCli *NahfpaCli_new(int argc, char *argv[])
 	self->input_file_path = NULL;
 	self->out_file_path = NULL;
 	self->log_file_path = NULL;
+	self->need_color = NULL;
 
 	self->logger = NULL;
-	self->pre_logger = Logger_new(LogInfo, NULL);
+	self->pre_logger = Logger_new(LogInfo, NULL, false);
 
 	return self;
 }
@@ -78,16 +80,17 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 {
 	Logger_log(self->pre_logger, LogInfo, "Parsing CLI arguments.");
 
-	const int arg_type_count = 5;
+	const int arg_type_count = 6;
 	const char *arg_names[][2] = {
 			{"-i",  "--input"},
 			{"-o",  "--out"},
 			{"-l",  "--log-level"},
 			{"-lf", "--log-file"},
+			{"-c", "--color"},
 			{"-h",  "--help"}
 	};
 	char *log_level_str = NULL;
-	char **arg_ptrs[] = {&self->input_file_path, &self->out_file_path, &log_level_str, &self->log_file_path};
+	char **arg_ptrs[] = {&self->input_file_path, &self->out_file_path, &log_level_str, &self->log_file_path, &self->need_color};
 
 	for (int arg_i = 1; arg_i < self->arg_count; arg_i++) {
 		char *arg = self->args[arg_i];
@@ -118,7 +121,7 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 	NahfpaCli_parse_min_log_level_from_string(self, log_level_str);
 	NahfpaCli_log_args(self);
 
-	self->logger = Logger_new(self->min_log_level, self->log_file_path);
+	self->logger = Logger_new(self->min_log_level, self->log_file_path, self->need_color ? strcmp(self->need_color, "yes") == 0 : false);
 
 	return CompileMode;
 }
