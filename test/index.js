@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const Handlebars = require("handlebars");
 const { tests } = require("./tests");
+const open = require('open');
+
 
 const root = path.resolve("../")
 const binary = `${root}\\cmake-build-debug\\nahfpa.exe`
@@ -77,6 +79,8 @@ async function main()
     fs.writeFileSync("test.html", template({
         tests: tests
     }));
+
+    await open("./test.html", { app: 'firefox' });
 }
 
 main().then(()=>console.log("Test suite quitting.")).catch((er)=>{throw er;});
