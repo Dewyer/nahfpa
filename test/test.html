@@ -89,7 +89,7 @@
 <body>
     <h1>NAHFPA Test Suite</h1>
         <div class="test">
-            <h2> <span class="no">1/1</span> frac
+            <h2> <span class="no">1/2</span> frac
                 <span class="success">SUCCESS</span>
             </h2>
             <p>Frac test.</p>
@@ -104,50 +104,105 @@
 	&lt;text class&#x3D;&quot;text&quot; x&#x3D;&quot;49.516000&quot; y&#x3D;&quot;52.750000&quot;&gt;2&lt;/text&gt;
 &lt;/svg&gt;" />
             <a style="margin-top: 1rem;" href="#" onclick="toggle_visibility('frac-out');">Show output</a>
-            <pre style="display: none;" id="frac-out">2020-10-26T16:58:14.000Z-INFO: NAPFHA - the MathTex like compiler
-2020-10-26T16:58:14.000Z-INFO: Parsing CLI arguments.
-2020-10-26T16:58:14.000Z-INFO: Supplied / Default CLI arguments:
-2020-10-26T16:58:14.000Z-INFO: 	Input file: ./artifacts/temp/inp.math
-2020-10-26T16:58:14.000Z-INFO: 	Output file path: ./artifacts/frac.svg
-2020-10-26T16:58:14.000Z-INFO: 	Log file: STDOUT
-2020-10-26T16:58:14.000Z-INFO: 	Minimum log level: INFO
-2020-10-26T16:58:14.000Z-INFO: NAPFHA loaded...
-2020-10-26T16:58:14.000Z-INFO: Reading script input from: ./artifacts/temp/inp.math:
-2020-10-26T16:58:14.000Z-INFO: Read 15 characters
-2020-10-26T16:58:14.000Z-INFO: STEP 1. : Tokenizer
-2020-10-26T16:58:14.000Z-INFO: INPUT: \frac{1}{2} &#x3D; 2
-2020-10-26T16:58:14.000Z-INFO: Tokenization successfull
-2020-10-26T16:58:14.000Z-INFO: 	[0]Token:&#x27;\frac&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[1]Token:&#x27;{&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[2]Token:&#x27;1&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[3]Token:&#x27;}&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[4]Token:&#x27;{&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[5]Token:&#x27;2&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[6]Token:&#x27;}&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[7]Token:&#x27;&#x3D;&#x27;
-2020-10-26T16:58:14.000Z-INFO: 	[8]Token:&#x27;2&#x27;
-2020-10-26T16:58:14.000Z-INFO: STEP 1. Tokenization FINISHED!
-2020-10-26T16:58:14.000Z-INFO: STEP 2. : Parse
-2020-10-26T16:58:14.000Z-INFO: &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; PARSED EXP ROOT : &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-2020-10-26T16:58:14.000Z-INFO: |T:NODE_LIST| v:  -- [0;8]
-2020-10-26T16:58:14.000Z-INFO: -NODE LIST:
-2020-10-26T16:58:14.000Z-INFO: 		|T:FRAC| v: \frac -- [0;6]
-2020-10-26T16:58:14.000Z-INFO: 		-ARG1:
-2020-10-26T16:58:14.000Z-INFO: 				|T:NODE_LIST| v:  -- [2;2]
-2020-10-26T16:58:14.000Z-INFO: 				-NODE LIST:
-2020-10-26T16:58:14.000Z-INFO: 						|T:LITERAL| v: 1 -- [2;2]
-2020-10-26T16:58:14.000Z-INFO: 		-ARG2:
-2020-10-26T16:58:14.000Z-INFO: 				|T:NODE_LIST| v:  -- [5;5]
-2020-10-26T16:58:14.000Z-INFO: 				-NODE LIST:
-2020-10-26T16:58:14.000Z-INFO: 						|T:LITERAL| v: 2 -- [5;5]
-2020-10-26T16:58:14.000Z-INFO: 		|T:LITERAL| v: &#x3D; -- [7;7]
-2020-10-26T16:58:14.000Z-INFO: 		|T:LITERAL| v: 2 -- [8;8]
-2020-10-26T16:58:14.000Z-INFO: &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-2020-10-26T16:58:14.000Z-INFO: STEP 2. Parsing FINISHED!
-2020-10-26T16:58:14.000Z-INFO: STEP 3. Building box model.
-2020-10-26T16:58:14.000Z-INFO: Box model dimensions: w: 66.266000, h: 81.000000
-2020-10-26T16:58:14.000Z-INFO: STEP 3. Box Model built
-2020-10-26T16:58:14.000Z-INFO: STEP 4. Rendering done.
+            <pre style="display: none;" id="frac-out">2020-10-26T17:02:52.000Z-INFO: NAPFHA - the MathTex like compiler
+2020-10-26T17:02:52.000Z-INFO: Parsing CLI arguments.
+2020-10-26T17:02:52.000Z-INFO: Supplied / Default CLI arguments:
+2020-10-26T17:02:52.000Z-INFO: 	Input file: ./artifacts/temp/inp.math
+2020-10-26T17:02:52.000Z-INFO: 	Output file path: ./artifacts/frac.svg
+2020-10-26T17:02:52.000Z-INFO: 	Log file: STDOUT
+2020-10-26T17:02:52.000Z-INFO: 	Minimum log level: INFO
+2020-10-26T17:02:52.000Z-INFO: NAPFHA loaded...
+2020-10-26T17:02:52.000Z-INFO: Reading script input from: ./artifacts/temp/inp.math:
+2020-10-26T17:02:52.000Z-INFO: Read 15 characters
+2020-10-26T17:02:52.000Z-INFO: STEP 1. : Tokenizer
+2020-10-26T17:02:52.000Z-INFO: INPUT: \frac{1}{2} &#x3D; 2
+2020-10-26T17:02:52.000Z-INFO: Tokenization successfull
+2020-10-26T17:02:52.000Z-INFO: 	[0]Token:&#x27;\frac&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[1]Token:&#x27;{&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[2]Token:&#x27;1&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[3]Token:&#x27;}&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[4]Token:&#x27;{&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[5]Token:&#x27;2&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[6]Token:&#x27;}&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[7]Token:&#x27;&#x3D;&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[8]Token:&#x27;2&#x27;
+2020-10-26T17:02:52.000Z-INFO: STEP 1. Tokenization FINISHED!
+2020-10-26T17:02:52.000Z-INFO: STEP 2. : Parse
+2020-10-26T17:02:52.000Z-INFO: &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; PARSED EXP ROOT : &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+2020-10-26T17:02:52.000Z-INFO: |T:NODE_LIST| v:  -- [0;8]
+2020-10-26T17:02:52.000Z-INFO: -NODE LIST:
+2020-10-26T17:02:52.000Z-INFO: 		|T:FRAC| v: \frac -- [0;6]
+2020-10-26T17:02:52.000Z-INFO: 		-ARG1:
+2020-10-26T17:02:52.000Z-INFO: 				|T:NODE_LIST| v:  -- [2;2]
+2020-10-26T17:02:52.000Z-INFO: 				-NODE LIST:
+2020-10-26T17:02:52.000Z-INFO: 						|T:LITERAL| v: 1 -- [2;2]
+2020-10-26T17:02:52.000Z-INFO: 		-ARG2:
+2020-10-26T17:02:52.000Z-INFO: 				|T:NODE_LIST| v:  -- [5;5]
+2020-10-26T17:02:52.000Z-INFO: 				-NODE LIST:
+2020-10-26T17:02:52.000Z-INFO: 						|T:LITERAL| v: 2 -- [5;5]
+2020-10-26T17:02:52.000Z-INFO: 		|T:LITERAL| v: &#x3D; -- [7;7]
+2020-10-26T17:02:52.000Z-INFO: 		|T:LITERAL| v: 2 -- [8;8]
+2020-10-26T17:02:52.000Z-INFO: &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+2020-10-26T17:02:52.000Z-INFO: STEP 2. Parsing FINISHED!
+2020-10-26T17:02:52.000Z-INFO: STEP 3. Building box model.
+2020-10-26T17:02:52.000Z-INFO: Box model dimensions: w: 66.266000, h: 81.000000
+2020-10-26T17:02:52.000Z-INFO: STEP 3. Box Model built
+2020-10-26T17:02:52.000Z-INFO: STEP 4. Rendering done.
+</pre>
+
+        </div>
+        <div class="test">
+            <h2> <span class="no">2/2</span> sum
+                <span class="success">SUCCESS</span>
+            </h2>
+            <p>Sum offseted</p>
+            <pre>a + \sum{10}</pre>
+                <img style="width: 81.252000px; height: 77.500000px;" class="svg" src="data:image/svg+xml;utf8,&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot; standalone&#x3D;&quot;no&quot; ?&gt;
+&lt;svg width&#x3D;&quot;81.252000&quot; height&#x3D;&quot;77.500000&quot; xmlns&#x3D;&quot;http://www.w3.org/2000/svg&quot;&gt;
+&lt;style&gt;.text { font-family: &#x27;Times new Roman&#x27;, serif; fill: black; font-size: 30px; letter-spacing: 1px;}.line { stroke: black; }.box { stroke: red; fill: rgba(0,0,0,0) }&lt;/style&gt;
+	&lt;text class&#x3D;&quot;text&quot; x&#x3D;&quot;0.000000&quot; y&#x3D;&quot;51.000000&quot;&gt;a&lt;/text&gt;
+	&lt;text class&#x3D;&quot;text&quot; x&#x3D;&quot;21.986000&quot; y&#x3D;&quot;51.000000&quot;&gt;+&lt;/text&gt;
+	&lt;text class&#x3D;&quot;text&quot; x&#x3D;&quot;47.752000&quot; y&#x3D;&quot;30.000000&quot;&gt;10&lt;/text&gt;
+	&lt;text class&#x3D;&quot;text&quot; x&#x3D;&quot;4.250000&quot; y&#x3D;&quot;68.500000&quot;&gt;∑&lt;/text&gt;
+&lt;/svg&gt;" />
+            <a style="margin-top: 1rem;" href="#" onclick="toggle_visibility('sum-out');">Show output</a>
+            <pre style="display: none;" id="sum-out">2020-10-26T17:02:52.000Z-INFO: NAPFHA - the MathTex like compiler
+2020-10-26T17:02:52.000Z-INFO: Parsing CLI arguments.
+2020-10-26T17:02:52.000Z-INFO: Supplied / Default CLI arguments:
+2020-10-26T17:02:52.000Z-INFO: 	Input file: ./artifacts/temp/inp.math
+2020-10-26T17:02:52.000Z-INFO: 	Output file path: ./artifacts/sum.svg
+2020-10-26T17:02:52.000Z-INFO: 	Log file: STDOUT
+2020-10-26T17:02:52.000Z-INFO: 	Minimum log level: INFO
+2020-10-26T17:02:52.000Z-INFO: NAPFHA loaded...
+2020-10-26T17:02:52.000Z-INFO: Reading script input from: ./artifacts/temp/inp.math:
+2020-10-26T17:02:52.000Z-INFO: Read 12 characters
+2020-10-26T17:02:52.000Z-INFO: STEP 1. : Tokenizer
+2020-10-26T17:02:52.000Z-INFO: INPUT: a + \sum{10}
+2020-10-26T17:02:52.000Z-INFO: Tokenization successfull
+2020-10-26T17:02:52.000Z-INFO: 	[0]Token:&#x27;a&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[1]Token:&#x27;+&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[2]Token:&#x27;\sum&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[3]Token:&#x27;{&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[4]Token:&#x27;10&#x27;
+2020-10-26T17:02:52.000Z-INFO: 	[5]Token:&#x27;}&#x27;
+2020-10-26T17:02:52.000Z-INFO: STEP 1. Tokenization FINISHED!
+2020-10-26T17:02:52.000Z-INFO: STEP 2. : Parse
+2020-10-26T17:02:52.000Z-INFO: &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; PARSED EXP ROOT : &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+2020-10-26T17:02:52.000Z-INFO: |T:NODE_LIST| v:  -- [0;5]
+2020-10-26T17:02:52.000Z-INFO: -NODE LIST:
+2020-10-26T17:02:52.000Z-INFO: 		|T:LITERAL| v: a -- [0;0]
+2020-10-26T17:02:52.000Z-INFO: 		|T:LITERAL| v: + -- [1;1]
+2020-10-26T17:02:52.000Z-INFO: 		|T:SUM| v: \sum -- [2;5]
+2020-10-26T17:02:52.000Z-INFO: 		-ARG1:
+2020-10-26T17:02:52.000Z-INFO: 				|T:NODE_LIST| v:  -- [4;4]
+2020-10-26T17:02:52.000Z-INFO: 				-NODE LIST:
+2020-10-26T17:02:52.000Z-INFO: 						|T:LITERAL| v: 10 -- [4;4]
+2020-10-26T17:02:52.000Z-INFO: &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+2020-10-26T17:02:52.000Z-INFO: STEP 2. Parsing FINISHED!
+2020-10-26T17:02:52.000Z-INFO: STEP 3. Building box model.
+2020-10-26T17:02:52.000Z-INFO: Box model dimensions: w: 81.252000, h: 77.500000
+2020-10-26T17:02:52.000Z-INFO: STEP 3. Box Model built
+2020-10-26T17:02:52.000Z-INFO: STEP 4. Rendering done.
 </pre>
 
         </div>

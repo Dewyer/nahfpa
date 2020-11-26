@@ -5,6 +5,11 @@ const tests = [
         description: "Frac test.",
         script:"\\frac{1}{2} = 2",
         shouldFail: false
+    },
+    {
+        title: "sum",
+        description: "Sum offseted",
+        script: "a + \\sum{10}"
     }
 ];
 module.exports = {tests};

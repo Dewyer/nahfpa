@@ -50,7 +50,7 @@ function extractSizeFromStdout(stdout)
 async function runTests()
 {
     let ranTests = [];
-    const cc = 0;
+    let cc = 0;
     for (let tt of tests)
     {
         const compRes = await compileString(tt.title, tt.script);
@@ -63,6 +63,7 @@ async function runTests()
             ...size,
             out: compRes.stdout || ''
         });
+        cc++;
     }
 
     return ranTests;
