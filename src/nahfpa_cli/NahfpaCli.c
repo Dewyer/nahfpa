@@ -10,13 +10,11 @@
 #include "expression_parser/ExpParser.h"
 #include "debugmalloc.h"
 
-typedef enum CliMode
-{
+typedef enum CliMode {
 	HelpMode, CompileMode
 } CliMode;
 
-struct NahfpaCli
-{
+struct NahfpaCli {
 	int arg_count;
 	char **args;
 
@@ -30,8 +28,7 @@ struct NahfpaCli
 	Logger *logger;
 };
 
-NahfpaCli *NahfpaCli_new(int argc, char *argv[])
-{
+NahfpaCli *NahfpaCli_new(int argc, char *argv[]) {
 	NahfpaCli *self = (NahfpaCli *) malloc(sizeof(*self));
 	self->arg_count = argc;
 	self->args = argv;
@@ -48,8 +45,7 @@ NahfpaCli *NahfpaCli_new(int argc, char *argv[])
 	return self;
 }
 
-void NahfpaCli_parse_min_log_level_from_string(NahfpaCli *self, char *log_level_str)
-{
+void NahfpaCli_parse_min_log_level_from_string(NahfpaCli *self, char *log_level_str) {
 	const int levels_count = 3;
 	char *level_names[][2] = {
 			{"i", "info"},
@@ -67,8 +63,7 @@ void NahfpaCli_parse_min_log_level_from_string(NahfpaCli *self, char *log_level_
 			self->min_log_level = (LogLevel) ii;
 }
 
-void NahfpaCli_log_args(const NahfpaCli *self)
-{
+void NahfpaCli_log_args(const NahfpaCli *self) {
 	Logger_log(self->pre_logger, LogInfo, "Supplied / Default CLI arguments:");
 	Logger_log(self->pre_logger, LogInfo, "\tInput file: %s", self->input_file_path ? self->input_file_path : "STDIN");
 	Logger_log(self->pre_logger, LogInfo, "\tOutput file path: %s", self->out_file_path);
@@ -76,8 +71,7 @@ void NahfpaCli_log_args(const NahfpaCli *self)
 	Logger_log(self->pre_logger, LogInfo, "\tMinimum log level: %s", LogLevel_to_string(self->min_log_level));
 }
 
-CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
-{
+CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self) {
 	Logger_log(self->pre_logger, LogInfo, "Parsing CLI arguments.");
 
 	const int arg_type_count = 6;
@@ -86,11 +80,12 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 			{"-o",  "--out"},
 			{"-l",  "--log-level"},
 			{"-lf", "--log-file"},
-			{"-c", "--color"},
+			{"-c",  "--color"},
 			{"-h",  "--help"}
 	};
 	char *log_level_str = NULL;
-	char **arg_ptrs[] = {&self->input_file_path, &self->out_file_path, &log_level_str, &self->log_file_path, &self->need_color};
+	char **arg_ptrs[] = {&self->input_file_path, &self->out_file_path, &log_level_str, &self->log_file_path,
+						 &self->need_color};
 
 	for (int arg_i = 1; arg_i < self->arg_count; arg_i++) {
 		char *arg = self->args[arg_i];
@@ -121,13 +116,13 @@ CliMode NahfpaCli_parse_args_get_cli_mode(NahfpaCli *self)
 	NahfpaCli_parse_min_log_level_from_string(self, log_level_str);
 	NahfpaCli_log_args(self);
 
-	self->logger = Logger_new(self->min_log_level, self->log_file_path, self->need_color ? strcmp(self->need_color, "yes") == 0 : false);
+	self->logger = Logger_new(self->min_log_level, self->log_file_path,
+							  self->need_color ? strcmp(self->need_color, "yes") == 0 : false);
 
 	return CompileMode;
 }
 
-DString *NahfpaCli_read_input(NahfpaCli *self)
-{
+DString *NahfpaCli_read_input(NahfpaCli *self) {
 	Logger_log(self->logger, LogInfo, "Reading script input from: %s:",
 			   self->input_file_path ? self->input_file_path : "STDIN");
 	FILE *inp;
@@ -156,8 +151,7 @@ DString *NahfpaCli_read_input(NahfpaCli *self)
 	return full_input_string;
 }
 
-void NahfpaCli_compile(NahfpaCli *self)
-{
+void NahfpaCli_compile(NahfpaCli *self) {
 	Logger_log(self->logger, LogInfo, "NAPFHA loaded...");
 
 	DString *latex = NahfpaCli_read_input(self);
@@ -173,13 +167,11 @@ void NahfpaCli_compile(NahfpaCli *self)
 	ExpParser_free(parser);
 }
 
-void NahpfaCli_show_help()
-{
+void NahpfaCli_show_help() {
 	printf("%s", HELP_TEXT);
 }
 
-void NahfpaCli_execute(NahfpaCli *self)
-{
+void NahfpaCli_execute(NahfpaCli *self) {
 	Logger_log(self->pre_logger, LogInfo, "NAPFHA - the MathTex like compiler");
 	CliMode running_mode = NahfpaCli_parse_args_get_cli_mode(self);
 
@@ -195,8 +187,7 @@ void NahfpaCli_execute(NahfpaCli *self)
 	}
 }
 
-void NahfpaCli_free(NahfpaCli *self)
-{
+void NahfpaCli_free(NahfpaCli *self) {
 	if (self->logger)
 		Logger_free(self->logger);
 

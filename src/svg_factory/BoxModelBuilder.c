@@ -10,15 +10,13 @@
 #include "debugmalloc.h"
 #include "AmfTextWidth.h"
 
-struct BoxModelBuilder
-{
+struct BoxModelBuilder {
 	Logger *logger;
 	ExpNode *exp_tree_root;
 	AmfTextWidth amf_text_width;
 };
 
-BoxModelBuilder *BoxModelBuilder_new(Logger *logger, ExpNode *exp_tree_root)
-{
+BoxModelBuilder *BoxModelBuilder_new(Logger *logger, ExpNode *exp_tree_root) {
 	BoxModelBuilder *self = (BoxModelBuilder *) malloc(sizeof(*self));
 	self->logger = logger;
 	self->exp_tree_root = exp_tree_root;
@@ -27,15 +25,13 @@ BoxModelBuilder *BoxModelBuilder_new(Logger *logger, ExpNode *exp_tree_root)
 	return self;
 }
 
-void BoxModelBuilder_free(BoxModelBuilder *self)
-{
+void BoxModelBuilder_free(BoxModelBuilder *self) {
 	free(self);
 }
 
 BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_node);
 
-void BoxModelBuilder_build_index_box(BoxModelBuilder *self, BoxNode *box_node)
-{
+void BoxModelBuilder_build_index_box(BoxModelBuilder *self, BoxNode *box_node) {
 	cassert(self->logger, box_node->node->arg1 != NULL, "Index needs a first argument");
 	const Vector *delta = &SCRIPT_BOX_DELTA;
 	Vector neg_delta;
@@ -71,15 +67,15 @@ void BoxModelBuilder_build_index_box(BoxModelBuilder *self, BoxNode *box_node)
 	box_node->centering_axis_y = box_node->arg1_box->centering_axis_y + box_node->arg1_box->offset.y;
 }
 
-void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_node)
-{
+void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_node) {
 	box_node->node_list_box = List_new();
 	const double gap = NODE_LIST_GAP;
 
 	for (size_t ii = 0; ii < box_node->node->node_list->item_count; ++ii) {
 		ExpNode *at_node = List_get(box_node->node->node_list, ii);
 		BoxNode *at_box = BoxModelBuilder_build_box_for_node(self, at_node);
-        const double needed_height = 2*double_max(at_box->box.height - at_box->centering_axis_y, at_box->centering_axis_y);
+		const double needed_height =
+				2 * double_max(at_box->box.height - at_box->centering_axis_y, at_box->centering_axis_y);
 
 		if (box_node->box.height < needed_height)
 			box_node->box.height = needed_height;
@@ -99,16 +95,15 @@ void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_nod
 			else
 				at_box->offset.y = 0;
 		} else {
-            at_box->offset.y = box_node->box.height/2.0 - at_box->centering_axis_y;
-        }
+			at_box->offset.y = box_node->box.height / 2.0 - at_box->centering_axis_y;
+		}
 	}
 
 	box_node->box.width -= gap;
 	box_node->centering_axis_y = box_node->box.height / 2.0;
 }
 
-void BoxModelBuilder_build_frac_box(BoxModelBuilder *self, BoxNode *box_node)
-{
+void BoxModelBuilder_build_frac_box(BoxModelBuilder *self, BoxNode *box_node) {
 	const double line_height = FRAC_LINE_HEIGHT;
 
 	if (box_node->node->arg1) {
@@ -134,11 +129,10 @@ void BoxModelBuilder_build_frac_box(BoxModelBuilder *self, BoxNode *box_node)
 		box_node->arg2_box->offset.y = (box_node->arg1_box ? box_node->arg1_box->box.height : 0) + line_height;
 	}
 
-	box_node->centering_axis_y = (box_node->arg1_box ? box_node->arg1_box->box.height : 0) + line_height/2.0;
+	box_node->centering_axis_y = (box_node->arg1_box ? box_node->arg1_box->box.height : 0) + line_height / 2.0;
 }
 
-void BoxModelBuilder_build_box_for_sqrt(BoxModelBuilder *self, BoxNode *box_node)
-{
+void BoxModelBuilder_build_box_for_sqrt(BoxModelBuilder *self, BoxNode *box_node) {
 	const Vector *delta = &SQRT_BOX_DELTA;
 
 	if (box_node->node->arg2) {
@@ -151,47 +145,43 @@ void BoxModelBuilder_build_box_for_sqrt(BoxModelBuilder *self, BoxNode *box_node
 		Vector_add_v(&box_node->arg1_box->offset, delta);
 	}
 
-	box_node->centering_axis_y = box_node->box.height/2.0;
+	box_node->centering_axis_y = box_node->box.height / 2.0;
 }
 
-void BoxModelBuilder_build_prod_sum_box(BoxModelBuilder *self, BoxNode *box_node)
-{
+void BoxModelBuilder_build_prod_sum_box(BoxModelBuilder *self, BoxNode *box_node) {
 	const Size *sum_prod_size = box_node->node->type == Sum ? &SUM_SIZE : &PROD_SIZE;
 	BoxModelBuilder_build_frac_box(self, box_node);
 	box_node->box.height = sum_prod_size->height + SUM_PROD_PADDING * 2;
 	box_node->box.width = double_max(box_node->box.width, sum_prod_size->width);
-    box_node->centering_axis_y = 0;
+	box_node->centering_axis_y = 0;
 	if (box_node->arg1_box) {
-        box_node->box.height += box_node->arg1_box->box.height;
-        box_node->centering_axis_y += box_node->arg1_box->box.height;
-    }
+		box_node->box.height += box_node->arg1_box->box.height;
+		box_node->centering_axis_y += box_node->arg1_box->box.height;
+	}
 
 	if (box_node->arg2_box) {
 		box_node->arg2_box->offset.y = SUM_PROD_PADDING * 2 + sum_prod_size->height +
 									   (box_node->arg1_box ? box_node->arg1_box->box.height : 0);
 		box_node->box.height += box_node->arg2_box->box.height;
-    }
-    box_node->centering_axis_y += sum_prod_size->height/ 2.0;
+	}
+	box_node->centering_axis_y += sum_prod_size->height / 2.0;
 }
 
-void BoxModelBuilder_build_lim_box(BoxModelBuilder *self, BoxNode *box_node)
-{
+void BoxModelBuilder_build_lim_box(BoxModelBuilder *self, BoxNode *box_node) {
 	box_node->box.height = LIM_SIZE.height;
 	box_node->box.width = LIM_SIZE.width;
-    box_node->centering_axis_y = LIM_SIZE.height / 2.0;
+	box_node->centering_axis_y = LIM_SIZE.height / 2.0;
 
-    if (box_node->node->arg1)
-	{
+	if (box_node->node->arg1) {
 		box_node->arg1_box = BoxModelBuilder_build_box_for_node(self, box_node->node->arg1);
 		box_node->box.height += box_node->arg1_box->box.height + LIM_PADDING;
 		box_node->box.width = double_max(LIM_SIZE.width, box_node->arg1_box->box.width);
 		box_node->arg1_box->offset.y += LIM_SIZE.height + LIM_PADDING;
-        Box_horizontal_center(&box_node->arg1_box->offset, &box_node->arg1_box->box, &box_node->box);
+		Box_horizontal_center(&box_node->arg1_box->offset, &box_node->arg1_box->box, &box_node->box);
 	}
 }
 
-void BoxModelBuilder_build_literal_box(BoxModelBuilder *self, BoxNode *box_node)
-{
+void BoxModelBuilder_build_literal_box(BoxModelBuilder *self, BoxNode *box_node) {
 	box_node->box.height = TEXT_HEIGHT + TEXT_CORRECTION;
 	box_node->box.width = 0;
 	const int length = DString_len(box_node->node->value);
@@ -204,15 +194,24 @@ void BoxModelBuilder_build_literal_box(BoxModelBuilder *self, BoxNode *box_node)
 	box_node->centering_axis_y = box_node->box.height / 2.0;
 }
 
-void BoxModelBuilder_build_symbol_box(BoxNode *box_node)
-{
+void BoxModelBuilder_build_symbol_box(BoxNode *box_node) {
 	SymbolDefinitionFindResults def = SymbolDefinition_get_supported_results(box_node->node->value);
 	box_node->box = def.is_uppercase ? def.definition->box_uppercase : def.definition->box;
 	box_node->centering_axis_y = box_node->box.height / 2.0;
 }
 
-BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_node)
+void BoxModelBuilder_build_bracket_box(BoxModelBuilder *self, BoxNode *box_node)
 {
+	const double bracket_width = NORMAL_BRACKET_WIDTH;
+	cassert(self->logger, box_node->node->arg1 != NULL, "Bracket needs at least one argument");
+	box_node->arg1_box = BoxModelBuilder_build_box_for_node(self, box_node->node->arg1);
+	box_node->box.width = 2*bracket_width + box_node->arg1_box->box.width;
+	box_node->box.height = box_node->arg1_box->box.height;
+	box_node->arg1_box->offset.x = bracket_width;
+	box_node->centering_axis_y = box_node->arg1_box->centering_axis_y;
+}
+
+BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_node) {
 	BoxNode *box = BoxNode_new(exp_node);
 
 	if (exp_node->type == Symbol) {
@@ -231,13 +230,14 @@ BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_
 		BoxModelBuilder_build_prod_sum_box(self, box);
 	} else if (exp_node->type == Lim) {
 		BoxModelBuilder_build_lim_box(self, box);
+	} else if (exp_node->type == Bracket) {
+		BoxModelBuilder_build_bracket_box(self, box);
 	}
 
 	return box;
 }
 
-BoxNode *BoxModelBuilder_build(BoxModelBuilder *self)
-{
+BoxNode *BoxModelBuilder_build(BoxModelBuilder *self) {
 	Logger_log(self->logger, LogInfo, "STEP 3. Building box model.");
 
 	BoxNode *root = BoxModelBuilder_build_box_for_node(self, self->exp_tree_root);

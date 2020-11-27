@@ -9,8 +9,7 @@
 #include <data_structures/DString.h>
 #include "geomerty.h"
 
-typedef struct SymbolDefinition
-{
+typedef struct SymbolDefinition {
 	char *command;
 	char *substitution;
 	char *uppercase_substitution;
@@ -18,8 +17,7 @@ typedef struct SymbolDefinition
 	Size box_uppercase;
 } SymbolDefinition;
 
-typedef struct SymbolDefinitionFindResults
-{
+typedef struct SymbolDefinitionFindResults {
 	bool found;
 	const SymbolDefinition *definition;
 	bool is_uppercase;

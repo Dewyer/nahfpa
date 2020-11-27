@@ -10,8 +10,7 @@
 #include "TokenSlice.h"
 #include "logger/logger.h"
 
-typedef enum ExpNodeType
-{
+typedef enum ExpNodeType {
 	Index,
 	NodeList,
 	Symbol,
@@ -21,12 +20,12 @@ typedef enum ExpNodeType
 	Sum,
 	Prod,
 	Lim,
-	Comment
+	Comment,
+	Bracket
 
 } ExpNodeType;
 
-typedef struct ExpNode
-{
+typedef struct ExpNode {
 	ExpNodeType type;
 	struct ExpNode *arg1;
 	struct ExpNode *arg2;

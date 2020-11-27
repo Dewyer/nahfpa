@@ -9,8 +9,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-typedef enum LogLevel
-{
+typedef enum LogLevel {
 	LogInfo = 0, LogWarning = 1, LogError = 2
 } LogLevel;
 

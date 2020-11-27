@@ -9,7 +9,7 @@
 
 typedef struct ExpTokenizer ExpTokenizer;
 
-ExpTokenizer *ExpTokenizer_new(Logger *logger,DString *raw_txt);
+ExpTokenizer *ExpTokenizer_new(Logger *logger, DString *raw_txt);
 
 List *ExpTokenizer_tokenize(ExpTokenizer *self);
 

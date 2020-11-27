@@ -1,8 +1,7 @@
 #ifndef NAHFPA_AMFTEXTWIDTH_H
 #define NAHFPA_AMFTEXTWIDTH_H
 
-typedef struct AmfTextWidth
-{
+typedef struct AmfTextWidth {
 	int character_map[256];
 } AmfTextWidth;
 

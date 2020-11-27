@@ -9,16 +9,14 @@
 #include <assert.h>
 #include "debugmalloc.h"
 
-struct Logger
-{
+struct Logger {
 	LogLevel min_level;
 	FILE *out_file;
 	bool should_free_out_file;
 	bool use_color;
 };
 
-Logger *Logger_new(LogLevel min_level, char *out_path, bool use_color)
-{
+Logger *Logger_new(LogLevel min_level, char *out_path, bool use_color) {
 	Logger *self = (Logger *) malloc(sizeof(*self));
 
 	self->min_level = min_level;
@@ -37,8 +35,7 @@ Logger *Logger_new(LogLevel min_level, char *out_path, bool use_color)
 	return self;
 }
 
-void Logger_print_date(Logger *self)
-{
+void Logger_print_date(Logger *self) {
 	time_t time_now_seconds;
 	time(&time_now_seconds);
 	struct tm *time_now = localtime(&time_now_seconds);
@@ -46,8 +43,7 @@ void Logger_print_date(Logger *self)
 			time_now->tm_mday, time_now->tm_hour, time_now->tm_min, time_now->tm_sec); //2020-11-02T22:37:12.736Z
 }
 
-char *LogLevel_to_string(const LogLevel level)
-{
+char *LogLevel_to_string(const LogLevel level) {
 	switch (level) {
 		case LogInfo:
 			return "INFO";
@@ -60,8 +56,7 @@ char *LogLevel_to_string(const LogLevel level)
 	}
 }
 
-void Logger_print_head(Logger *self, LogLevel level)
-{
+void Logger_print_head(Logger *self, LogLevel level) {
 	char *level_name = LogLevel_to_string(level);
 
 	if (self->use_color) {
@@ -87,8 +82,7 @@ void Logger_print_head(Logger *self, LogLevel level)
 		fprintf(self->out_file, "\033[0m");
 }
 
-void Logger_log(Logger *self, LogLevel level, char *format, ...)
-{
+void Logger_log(Logger *self, LogLevel level, char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	Logger_log_varg(self, level, format, ap);
@@ -96,8 +90,7 @@ void Logger_log(Logger *self, LogLevel level, char *format, ...)
 	va_end(ap);
 }
 
-void Logger_log_varg(Logger *self, LogLevel level, char *format, va_list va_list)
-{
+void Logger_log_varg(Logger *self, LogLevel level, char *format, va_list va_list) {
 	if (level < self->min_level)
 		return;
 
@@ -106,8 +99,7 @@ void Logger_log_varg(Logger *self, LogLevel level, char *format, va_list va_list
 	fprintf(self->out_file, "\n");
 }
 
-void Logger_free(Logger *self)
-{
+void Logger_free(Logger *self) {
 	if (self->should_free_out_file)
 		fclose(self->out_file);
 

@@ -9,12 +9,11 @@
 #include <expression_parser/ExpNode.h>
 #include <utils/geomerty.h>
 
-typedef struct BoxNode
-{
+typedef struct BoxNode {
 	Vector offset;
 	Vector global_pos;
 	Size box;
-    double centering_axis_y;
+	double centering_axis_y;
 
 	struct BoxNode *arg1_box;
 	struct BoxNode *arg2_box;

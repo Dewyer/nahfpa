@@ -7,20 +7,20 @@
 #include <logger/logger.h>
 #include <utils/cassert.h>
 #include <utils/symbols_helper.h>
+#include <assert.h>
+#include <utils/brackets.h>
 #include "../expression_tokenizer/ExpTokenizer.h"
 #include "debugmalloc.h"
 #include "ExpNode.h"
 
-struct ExpParser
-{
+struct ExpParser {
 	Logger *logger;
 
 	ExpTokenizer *tokenizer;
 	ListG(DString*) *tokens;
 };
 
-ExpParser *ExpParser_new(Logger *logger, DString *raw_txt)
-{
+ExpParser *ExpParser_new(Logger *logger, DString *raw_txt) {
 	ExpParser *exp = (ExpParser *) malloc(sizeof(*exp));
 	exp->logger = logger;
 	exp->tokenizer = ExpTokenizer_new(logger, raw_txt);
@@ -28,9 +28,10 @@ ExpParser *ExpParser_new(Logger *logger, DString *raw_txt)
 	return exp;
 }
 
-TokenSlice *ExpParser_get_command_argument_slice(ExpParser *self, const DString *command, bool required, size_t start_i,
-												 size_t max_i)
-{
+TokenSlice *
+ExpParser_get_bracketed_slice(ExpParser *self, const DString *command, const DString *bracket, bool required,
+							  size_t start_i,
+							  size_t max_i) {
 	const bool didnt_reached_end = start_i < max_i;
 	if (required)
 		cassert(self->logger, didnt_reached_end, "%s needs at least one argument but expression end reached.",
@@ -39,8 +40,9 @@ TokenSlice *ExpParser_get_command_argument_slice(ExpParser *self, const DString 
 		return NULL;
 
 	const DString *starting_token = List_get(self->tokens, start_i);
+	const char *closing_bracket = get_closing_bracket_for_bracket(bracket);
 
-	const bool starts_with_brace = DString_eq_CString(starting_token, "{");
+	const bool starts_with_brace = DString_eq_DString(starting_token, bracket);
 	if (required)
 		cassert(self->logger, starts_with_brace, "%s needs at least one argument.", DString_to_CString(command));
 	else if (!starts_with_brace)
@@ -52,9 +54,9 @@ TokenSlice *ExpParser_get_command_argument_slice(ExpParser *self, const DString 
 
 	for (size_t ii = start_i + 1; ii <= max_i; ++ii) {
 		const DString *at_token = List_get(self->tokens, ii);
-		if (DString_eq_CString(at_token, "{"))
+		if (DString_eq_DString(at_token, bracket))
 			bracer_count++;
-		else if (DString_eq_CString(at_token, "}")) {
+		else if (DString_eq_CString(at_token, closing_bracket)) {
 			if (bracer_count == 0) {
 				found_ending_brace = true;
 				arg_slice->end = ii;
@@ -69,8 +71,16 @@ TokenSlice *ExpParser_get_command_argument_slice(ExpParser *self, const DString 
 	return arg_slice;
 }
 
-bool token_is_a_command(DString *token)
-{
+TokenSlice *ExpParser_get_command_argument_slice(ExpParser *self, const DString *command, bool required, size_t start_i,
+												 size_t max_i) {
+	DString *bracket = DString_from_CString("{");
+	TokenSlice *slc = ExpParser_get_bracketed_slice(self, command, bracket, required, start_i, max_i);
+	DString_free(bracket);
+
+	return slc;
+}
+
+bool token_is_a_command(DString *token) {
 	return DString_eq_CString(token, "\\frac") ||
 		   DString_eq_CString(token, "\\sqrt") ||
 		   DString_eq_CString(token, "\\sum") ||
@@ -81,14 +91,18 @@ bool token_is_a_command(DString *token)
 		   DString_eq_CString(token, "\\text");
 }
 
-bool token_is_sub_or_superscript(DString *token)
-{
+bool token_is_sub_or_superscript(DString *token) {
 	return DString_eq_CString(token, "_") ||
 		   DString_eq_CString(token, "^");
 }
 
-bool token_might_be_symbol(DString *token)
-{
+bool token_is_bracket(DString *token) {
+	return DString_eq_CString(token, "(") ||
+		   DString_eq_CString(token, "[") ||
+		   DString_eq_CString(token, "\\{");
+}
+
+bool token_might_be_symbol(DString *token) {
 	return DString_starts_with(token, "\\");
 }
 
@@ -96,8 +110,7 @@ ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice);
 
 TokenSlice *
 ExpParser_parse_command_args(ExpParser *self, ExpNode *command, int required_args, int max_args, size_t args_start,
-							 size_t max_i)
-{
+							 size_t max_i) {
 	// FIXME Refactor to use an iterable
 	TokenSlice *arg1_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 1, args_start,
 																  max_i);
@@ -105,9 +118,11 @@ ExpParser_parse_command_args(ExpParser *self, ExpNode *command, int required_arg
 	TokenSlice *arg3_slice = NULL;
 
 	if (arg1_slice && max_args >= 2)
-		arg2_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 2, arg1_slice->end + 1, max_i);
+		arg2_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 2, arg1_slice->end + 1,
+														  max_i);
 	if (arg2_slice && max_args >= 3)
-		arg3_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 3, arg2_slice->end + 1, max_i);
+		arg3_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 3, arg2_slice->end + 1,
+														  max_i);
 
 	if (arg1_slice) {
 		TokenSlice *real_sl1 = TokenSlice_shrink_clone(arg1_slice);
@@ -119,14 +134,14 @@ ExpParser_parse_command_args(ExpParser *self, ExpNode *command, int required_arg
 		command->arg2 = ExpParser_parse_node_list(self, real_sl2);
 		command->arg2->parent = command;
 	}
-	if (arg3_slice)
-	{
+	if (arg3_slice) {
 		TokenSlice *real_sl3 = TokenSlice_shrink_clone(arg3_slice);
 		command->arg3 = ExpParser_parse_node_list(self, real_sl3);
 		command->arg3->parent = command;
 	}
 
-	TokenSlice *final_slice = TokenSlice_new(arg1_slice ?  arg1_slice->start : args_start, arg1_slice ? arg1_slice->end : args_start);
+	TokenSlice *final_slice = TokenSlice_new(arg1_slice ? arg1_slice->start : args_start,
+											 arg1_slice ? arg1_slice->end : args_start);
 	if (arg2_slice) {
 		final_slice->end = arg2_slice->end;
 		TokenSlice_free(arg2_slice);
@@ -140,8 +155,7 @@ ExpParser_parse_command_args(ExpParser *self, ExpNode *command, int required_arg
 	return final_slice;
 }
 
-ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t command_start, size_t max_i)
-{
+ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t command_start, size_t max_i) {
 	ExpNodeType type = Frac;
 	int required_arg_c = 0;
 	int max_arg_c = 0;
@@ -170,20 +184,19 @@ ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t comma
 		type = Index;
 		required_arg_c = 1;
 		max_arg_c = 3;
- 	} else if (DString_eq_CString(command, "\\#")) {
+	} else if (DString_eq_CString(command, "\\#")) {
 		ExpNode *comment_node = ExpNode_new(Comment);
-		TokenSlice *comment_slice = ExpParser_get_command_argument_slice(self, command, true, command_start+1,
-																	  max_i);
+		TokenSlice *comment_slice = ExpParser_get_command_argument_slice(self, command, true, command_start + 1,
+																		 max_i);
 		comment_node->origin = TokenSlice_new(command_start, comment_slice->end);
 		TokenSlice_free(comment_slice);
 
 		return comment_node;
-	} else if (DString_eq_CString(command, "\\text"))
-	{
+	} else if (DString_eq_CString(command, "\\text")) {
 		ExpNode *text_node = ExpNode_new(Literal);
-		TokenSlice *text_slice = ExpParser_get_command_argument_slice(self, command, true, command_start+1,
-																		 max_i);
-		text_node->value = ExpTokenizer_get_token_substring(self->tokenizer, text_slice->start, text_slice->end-1);
+		TokenSlice *text_slice = ExpParser_get_command_argument_slice(self, command, true, command_start + 1,
+																	  max_i);
+		text_node->value = ExpTokenizer_get_token_substring(self->tokenizer, text_slice->start, text_slice->end - 1);
 		text_node->origin = TokenSlice_new(command_start, text_slice->end);
 		TokenSlice_free(text_slice);
 
@@ -200,8 +213,7 @@ ExpNode *ExpParser_parse_command(ExpParser *self, DString *command, size_t comma
 	return cmd_node;
 }
 
-ExpNode *ExpParser_parse_from_string(DString *str, size_t ii)
-{
+ExpNode *ExpParser_parse_from_string(DString *str, size_t ii) {
 	ExpNode *node = ExpNode_new(Literal);
 	node->value = DString_clone(str);
 	node->origin = TokenSlice_new(ii, ii);
@@ -209,8 +221,7 @@ ExpNode *ExpParser_parse_from_string(DString *str, size_t ii)
 	return node;
 }
 
-ExpNode *ExpParser_parse_sub_or_superscript(DString *script_token, size_t script_i)
-{
+ExpNode *ExpParser_parse_sub_or_superscript(DString *script_token, size_t script_i) {
 	ExpNode *node = ExpNode_new(Index);
 	node->value = DString_clone(script_token);
 	node->origin = TokenSlice_new(script_i, script_i);
@@ -218,8 +229,7 @@ ExpNode *ExpParser_parse_sub_or_superscript(DString *script_token, size_t script
 	return node;
 }
 
-ExpNode *ExpParser_parse_symbol(ExpParser *self, DString *sym, size_t sym_i)
-{
+ExpNode *ExpParser_parse_symbol(ExpParser *self, DString *sym, size_t sym_i) {
 	SymbolDefinitionFindResults results = SymbolDefinition_get_supported_results(sym);
 
 	cassert(self->logger, results.found, "%s is not a supported command", DString_to_CString(sym));
@@ -229,10 +239,10 @@ ExpNode *ExpParser_parse_symbol(ExpParser *self, DString *sym, size_t sym_i)
 	return node;
 }
 
-ExpNode *ExpParser_parse_inline_node_list(ExpParser *self, size_t start_i, size_t max_i)
-{
+ExpNode *
+ExpParser_parse_bracketed_inline_node_list(ExpParser *self, const DString *bracket, size_t start_i, size_t max_i) {
 	DString *cmd = DString_from_CString("Expression list");
-	TokenSlice *slice = ExpParser_get_command_argument_slice(self, cmd, true, start_i, max_i);
+	TokenSlice *slice = ExpParser_get_bracketed_slice(self, cmd, bracket, true, start_i, max_i);
 	TokenSlice *real_slice = TokenSlice_shrink_clone(slice);
 
 	ExpNode *node = ExpParser_parse_node_list(self, real_slice);
@@ -244,8 +254,22 @@ ExpNode *ExpParser_parse_inline_node_list(ExpParser *self, size_t start_i, size_
 	return node;
 }
 
-void ExpParser_transform_node_list_for_scripts(ExpParser *self, ExpNode *node_list)
-{
+ExpNode *ExpParser_parse_inline_node_list(ExpParser *self, size_t start_i, size_t max_i) {
+	DString *bracket = DString_from_CString("{");
+	ExpNode *node = ExpParser_parse_bracketed_inline_node_list(self, bracket, start_i, max_i);
+	DString_free(bracket);
+	return node;
+}
+
+ExpNode *ExpParser_parse_brackets(ExpParser *self, DString *bracket, size_t start_i, size_t max_i) {
+	ExpNode *node = ExpNode_new(Bracket);
+	node->value = DString_clone(bracket);
+	node->arg1 = ExpParser_parse_bracketed_inline_node_list(self, bracket, start_i, max_i);
+	node->origin = TokenSlice_new(node->arg1->origin->start, node->arg1->origin->end);
+	return node;
+}
+
+void ExpParser_transform_node_list_for_scripts(ExpParser *self, ExpNode *node_list) {
 	cassert(self->logger, !!node_list->node_list, "Only node lists can be script transformed.");
 	ListG(ExpNode*) *new_node_list = List_new();
 
@@ -279,8 +303,7 @@ void ExpParser_transform_node_list_for_scripts(ExpParser *self, ExpNode *node_li
 	node_list->node_list = new_node_list;
 }
 
-ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice)
-{
+ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice) {
 	ExpNode *node = ExpNode_new(NodeList);
 	node->node_list = List_new();
 	node->origin = slice;
@@ -299,6 +322,9 @@ ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice)
 		} else if (DString_eq_CString(at_token, "{")) {
 			at_node = ExpParser_parse_inline_node_list(self, at_token_i, slice->end);
 			at_token_i = at_node->origin->end;
+		} else if (token_is_bracket(at_token)) {
+			at_node = ExpParser_parse_brackets(self, at_token, at_token_i, slice->end);
+			at_token_i = at_node->origin->end;
 		} else {
 			at_node = ExpParser_parse_from_string(at_token, at_token_i);
 			at_node->type = Literal;
@@ -315,8 +341,7 @@ ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice)
 	return node;
 }
 
-ExpNode *ExpParser_do_parse(ExpParser *self)
-{
+ExpNode *ExpParser_do_parse(ExpParser *self) {
 	Logger_log(self->logger, LogInfo, "STEP 2. : Parse");
 
 	TokenSlice *main_slice = TokenSlice_new(0, self->tokens->item_count - 1);
@@ -331,8 +356,7 @@ ExpNode *ExpParser_do_parse(ExpParser *self)
 	return root;
 }
 
-void ExpParser_tokenize(ExpParser *self)
-{
+void ExpParser_tokenize(ExpParser *self) {
 	Logger_log(self->logger, LogInfo, "STEP 1. : Tokenizer");
 	Logger_log(self->logger, LogInfo, "INPUT: %s", DString_to_CString(ExpTokenizer_get_raw_txt(self->tokenizer)));
 
@@ -348,14 +372,12 @@ void ExpParser_tokenize(ExpParser *self)
 	self->tokens = tokens;
 }
 
-ExpNode *ExpParser_parse(ExpParser *self)
-{
+ExpNode *ExpParser_parse(ExpParser *self) {
 	ExpParser_tokenize(self);
 	return ExpParser_do_parse(self);
 }
 
-void ExpParser_free(ExpParser *self)
-{
+void ExpParser_free(ExpParser *self) {
 	List_free_2D(self->tokens, (void (*)(void *)) DString_free);
 	ExpTokenizer_free(self->tokenizer);
 

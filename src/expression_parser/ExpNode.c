@@ -6,8 +6,7 @@
 #include "ExpNode.h"
 #include "debugmalloc.h"
 
-ExpNode *ExpNode_new(ExpNodeType type)
-{
+ExpNode *ExpNode_new(ExpNodeType type) {
 	ExpNode *exp_node = (ExpNode *) malloc(sizeof(*exp_node));
 	exp_node->node_list = NULL;
 	exp_node->arg1 = NULL;
@@ -21,8 +20,7 @@ ExpNode *ExpNode_new(ExpNodeType type)
 	return exp_node;
 }
 
-char *get_tab_prefix(int lvl)
-{
+char *get_tab_prefix(int lvl) {
 	char *pref = (char *) calloc(2 * lvl + 1, sizeof(*pref));
 	for (int ii = 0; ii < lvl; ++ii) {
 		pref[ii * 2] = '\t';
@@ -33,8 +31,7 @@ char *get_tab_prefix(int lvl)
 	return pref;
 }
 
-char *type_to_string(ExpNodeType type)
-{
+char *type_to_string(ExpNodeType type) {
 	switch (type) {
 		case Frac:
 			return "FRAC";
@@ -54,13 +51,14 @@ char *type_to_string(ExpNodeType type)
 			return "LITERAL";
 		case Lim:
 			return "LIM";
+		case Bracket:
+			return "BRACKET";
 		default:
 			return "UNKNOWN";
 	}
 }
 
-void ExpNode_log_with_lvl(const ExpNode *self, Logger *logger, int lvl)
-{
+void ExpNode_log_with_lvl(const ExpNode *self, Logger *logger, int lvl) {
 	char *prefix = get_tab_prefix(lvl);
 	Logger_log(logger, LogInfo, "%s|T:%s| v: %s -- [%u;%u]", prefix, type_to_string(self->type),
 			   self->value ? DString_to_CString(self->value) : "", self->origin ? self->origin->start : 0,
@@ -91,13 +89,11 @@ void ExpNode_log_with_lvl(const ExpNode *self, Logger *logger, int lvl)
 	free(prefix);
 }
 
-void ExpNode_log(const ExpNode *self, Logger *logger)
-{
+void ExpNode_log(const ExpNode *self, Logger *logger) {
 	ExpNode_log_with_lvl(self, logger, 0);
 }
 
-void ExpNode_free(ExpNode *self)
-{
+void ExpNode_free(ExpNode *self) {
 	if (self->node_list)
 		List_free_2D(self->node_list, (void (*)(void *)) ExpNode_free);
 

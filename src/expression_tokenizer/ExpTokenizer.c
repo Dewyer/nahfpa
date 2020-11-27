@@ -8,16 +8,14 @@
 #include "data_structures/common.h"
 #include "debugmalloc.h"
 
-struct ExpTokenizer
-{
+struct ExpTokenizer {
 	Logger *logger;
 	DString *raw_txt;
 	ListG(*size_t) *token_to_text_i;
 	ListG(*DString) *tokens;
 };
 
-ExpTokenizer *ExpTokenizer_new(Logger *logger,DString *raw_txt)
-{
+ExpTokenizer *ExpTokenizer_new(Logger *logger, DString *raw_txt) {
 	ExpTokenizer *exp = (ExpTokenizer *) malloc(sizeof(*exp));
 	exp->logger = logger;
 	exp->raw_txt = raw_txt;
@@ -27,33 +25,28 @@ ExpTokenizer *ExpTokenizer_new(Logger *logger,DString *raw_txt)
 	return exp;
 }
 
-void size_t_free(size_t *pp)
-{
+void size_t_free(size_t *pp) {
 	free(pp);
 }
 
-size_t *size_t_new(size_t tt)
-{
+size_t *size_t_new(size_t tt) {
 	size_t *new_p = malloc(sizeof(*new_p));
 	*new_p = tt;
 
 	return new_p;
 }
 
-bool is_char_whitespace(char cc)
-{
+bool is_char_whitespace(char cc) {
 	return cc == ' ' || cc == '\t' || cc == '\n' || cc == '\r';
 }
 
-bool is_single_operator(char cc)
-{
+bool is_single_operator(char cc) {
 	return cc == '+' || cc == '-' || cc == '/' || cc == '*' || cc == '<' || cc == '>' || cc == '=' || cc == '{' ||
 		   cc == '}'
 		   || cc == '(' || cc == ')' || cc == '[' || cc == ']' || cc == '^' || cc == '_';
 }
 
-bool ExpTokenizer_flush_tokenizer(ExpTokenizer *self,List *tokens, DString *last_token_buffer, size_t at_char_i)
-{
+bool ExpTokenizer_flush_tokenizer(ExpTokenizer *self, List *tokens, DString *last_token_buffer, size_t at_char_i) {
 	if (DString_len(last_token_buffer) > 0) {
 		List_push(self->token_to_text_i, size_t_new(at_char_i));
 		List_push(tokens, last_token_buffer);
@@ -64,13 +57,11 @@ bool ExpTokenizer_flush_tokenizer(ExpTokenizer *self,List *tokens, DString *last
 	return false;
 }
 
-bool is_token_escapable(const DString *token)
-{
+bool is_token_escapable(const DString *token) {
 	return DString_eq_CString(token, "{") || DString_eq_CString(token, "}");
 }
 
-ListG(DString*) *ExpTokenizer_union_escape_sequences(const ListG(DString*) *tokens)
-{
+ListG(DString*) *ExpTokenizer_union_escape_sequences(const ListG(DString*) *tokens) {
 	ListG(DString*) *new_tokens = List_new();
 	int last_token_concated = -1;
 
@@ -98,8 +89,7 @@ ListG(DString*) *ExpTokenizer_union_escape_sequences(const ListG(DString*) *toke
 	return new_tokens;
 }
 
-ListG(DString*) *ExpTokenizer_tokenize(ExpTokenizer *self)
-{
+ListG(DString*) *ExpTokenizer_tokenize(ExpTokenizer *self) {
 	ListG(DString*) *tokens = List_new();
 	const int exp_len = DString_len(self->raw_txt);
 	const char *raw_cstring = DString_to_CString(self->raw_txt);
@@ -134,7 +124,7 @@ ListG(DString*) *ExpTokenizer_tokenize(ExpTokenizer *self)
 		}
 	}
 
-	ExpTokenizer_flush_tokenizer(self, tokens, last_token_buffer, (size_t)exp_len-1);
+	ExpTokenizer_flush_tokenizer(self, tokens, last_token_buffer, (size_t) exp_len - 1);
 
 	ListG(DString*) *escaped_tokens = ExpTokenizer_union_escape_sequences(tokens);
 	List_free_2D(tokens, (void (*)(void *)) DString_free);
@@ -143,16 +133,15 @@ ListG(DString*) *ExpTokenizer_tokenize(ExpTokenizer *self)
 	return escaped_tokens;
 }
 
-DString *ExpTokenizer_get_token_substring(ExpTokenizer *self, size_t start, size_t end)
-{
+DString *ExpTokenizer_get_token_substring(ExpTokenizer *self, size_t start, size_t end) {
 	cassert(self->logger, start < end, "Token substring start over end");
-	cassert(self->logger, end < self->tokens->item_count-1, "Token substring end over token length");
+	cassert(self->logger, end < self->tokens->item_count - 1, "Token substring end over token length");
 
 	size_t *str_start_i = List_get(self->token_to_text_i, start);
 	size_t str_end_i;
-	if (end == self->tokens->item_count-1)
-		str_end_i = DString_len(self->raw_txt)-1;
-	else{
+	if (end == self->tokens->item_count - 1)
+		str_end_i = DString_len(self->raw_txt) - 1;
+	else {
 		size_t *end_ptr = List_get(self->token_to_text_i, end + 1);
 		str_end_i = *end_ptr - 1;
 	}
@@ -160,14 +149,12 @@ DString *ExpTokenizer_get_token_substring(ExpTokenizer *self, size_t start, size
 	return DString_substring(self->raw_txt, *str_start_i, str_end_i);
 }
 
-void ExpTokenizer_free(ExpTokenizer *self)
-{
+void ExpTokenizer_free(ExpTokenizer *self) {
 	DString_free(self->raw_txt);
 	List_free_2D(self->token_to_text_i, (void (*)(void *)) size_t_free);
 	free(self);
 }
 
-const DString *ExpTokenizer_get_raw_txt(const ExpTokenizer *self)
-{
+const DString *ExpTokenizer_get_raw_txt(const ExpTokenizer *self) {
 	return self->raw_txt;
 }

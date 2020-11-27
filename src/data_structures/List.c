@@ -4,16 +4,14 @@
 #include "List.h"
 #include "debugmalloc.h"
 
-List *List_new()
-{
+List *List_new() {
 	List *ll = (List *) malloc(sizeof(*ll));
 	ll->head = NULL;
 	ll->item_count = 0;
 	return ll;
 }
 
-void List_push(List *self, void *item)
-{
+void List_push(List *self, void *item) {
 	ListItem *last_item_ptr = self->head;
 
 	for (int ii = 1; (size_t) ii < self->item_count; ii++) {
@@ -35,8 +33,7 @@ void List_push(List *self, void *item)
 	self->item_count++;
 }
 
-void *List_get(const List *self, size_t index)
-{
+void *List_get(const List *self, size_t index) {
 	if (index >= self->item_count) {
 		return NULL;
 	}
@@ -49,8 +46,7 @@ void *List_get(const List *self, size_t index)
 	return at_item_ptr->item_data;
 }
 
-void List_free_2D(List *self, void (*free_item)(void *))
-{
+void List_free_2D(List *self, void (*free_item)(void *)) {
 	if (self->item_count == 0) {
 		free(self);
 		return;
@@ -69,7 +65,6 @@ void List_free_2D(List *self, void (*free_item)(void *))
 	free(self);
 }
 
-void List_free(List *self)
-{
+void List_free(List *self) {
 	List_free_2D(self, NULL);
 }

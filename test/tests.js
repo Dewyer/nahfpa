@@ -1,9 +1,8 @@
-
 const tests = [
     {
         title: "frac",
         description: "Frac test.",
-        script:"\\frac{1}{2} = 2",
+        script: "\\frac{1}{2} = 2",
         shouldFail: false
     },
     {
@@ -46,5 +45,15 @@ const tests = [
         description: "Text",
         script: "200 + \\sqrt{\\text{\\frac{keksz} lolzer}}"
     },
+    {
+        title: "bracket1",
+        description: "Bracket 1",
+        script: "(100 + 20)"  
+    },
+    {
+        title: "bracket2",
+        description: "Bracket 2",
+        script: "2 + (\\frac{123}{456})"  
+    }
 ];
 module.exports = {tests};

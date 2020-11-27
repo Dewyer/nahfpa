@@ -4,8 +4,7 @@
 #include "SvgFile.h"
 #include "debugmalloc.h"
 
-struct SvgFile
-{
+struct SvgFile {
 	FILE *file;
 };
 
@@ -14,8 +13,7 @@ const char *STYLE =
 		".line { stroke: black; }"
 		".box { stroke: red; fill: rgba(0,0,0,0) }";
 
-SvgFile *SvgFile_new(FILE *file, Size *view_port)
-{
+SvgFile *SvgFile_new(FILE *file, Size *view_port) {
 	SvgFile *self = (SvgFile *) malloc(sizeof(*self));
 	self->file = file;
 
@@ -26,8 +24,7 @@ SvgFile *SvgFile_new(FILE *file, Size *view_port)
 	return self;
 }
 
-DString *SvgFile_escape_text(const DString *txt)
-{
+DString *SvgFile_escape_text(const DString *txt) {
 	DString *new_str = DString_new();
 
 	for (size_t ii = 0; ii < DString_len(txt); ++ii) {
@@ -48,8 +45,7 @@ DString *SvgFile_escape_text(const DString *txt)
 	return new_str;
 }
 
-void SvgFile_add_text(SvgFile *self, const DString *text, const Vector *pos)
-{
+void SvgFile_add_text(SvgFile *self, const DString *text, const Vector *pos) {
 	DString *escp_txt = SvgFile_escape_text(text);
 	fprintf(self->file, "\t<text class=\"text\" x=\"%f\" y=\"%f\">%s</text>\n", pos->x,
 			pos->y + TEXT_HEIGHT,
@@ -58,21 +54,29 @@ void SvgFile_add_text(SvgFile *self, const DString *text, const Vector *pos)
 	DString_free(escp_txt);
 }
 
-void SvgFile_add_line(SvgFile *self, const Vector *p1, const Vector *p2)
-{
+void SvgFile_add_sized_text(SvgFile *self, const DString *text, const Vector *pos, const double size) {
+	DString *escp_txt = SvgFile_escape_text(text);
+	fprintf(self->file, "\t<text class=\"text\" style=\"font-size: %fpx;\" x=\"%f\" y=\"%f\">%s</text>\n",size , pos->x,
+			pos->y + size,
+			DString_to_CString(escp_txt));
+
+	DString_free(escp_txt);
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths  quadratic
+
+void SvgFile_add_line(SvgFile *self, const Vector *p1, const Vector *p2) {
 	fprintf(self->file, "\t<line class=\"line\" x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" />\n", p1->x, p1->y, p2->x,
 			p2->y);
 }
 
-void SvgFile_add_box(SvgFile *self, const Vector *pp, const Size *size)
-{
+void SvgFile_add_box(SvgFile *self, const Vector *pp, const Size *size) {
 	fprintf(self->file, "\t<rect class=\"box\" x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" />\n", pp->x, pp->y,
 			size->width,
 			size->height);
 }
 
-void SvgFile_close(SvgFile *self)
-{
+void SvgFile_close(SvgFile *self) {
 	fprintf(self->file, "</svg>");
 	fclose(self->file);
 	free(self);

@@ -3,8 +3,7 @@
 
 #include <stddef.h>
 
-typedef struct TokenSlice
-{
+typedef struct TokenSlice {
 	size_t start;
 	size_t end;
 } TokenSlice;

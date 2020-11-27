@@ -1,8 +1,7 @@
 #include <nahfpa_cli/NahfpaCli.h>
 #include "debugmalloc.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	NahfpaCli *cli = NahfpaCli_new(argc, argv);
 	NahfpaCli_execute(cli);
 

@@ -9,14 +9,12 @@
 
 #define ListG(type) List
 
-typedef struct List
-{
+typedef struct List {
 	size_t item_count;
 	struct ListItem *head;
 } List;
 
-typedef struct ListItem
-{
+typedef struct ListItem {
 	void *item_data;
 	struct ListItem *next_ptr;
 	struct ListItem *last_ptr;

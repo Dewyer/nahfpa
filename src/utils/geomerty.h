@@ -5,14 +5,12 @@
 #ifndef NAHFPA_GEOMERTY_H
 #define NAHFPA_GEOMERTY_H
 
-typedef struct Vector
-{
+typedef struct Vector {
 	double x;
 	double y;
 } Vector;
 
-typedef struct Size
-{
+typedef struct Size {
 	double width;
 	double height;
 } Size;

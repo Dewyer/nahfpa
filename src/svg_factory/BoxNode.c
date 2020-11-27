@@ -5,8 +5,7 @@
 #include "BoxNode.h"
 #include "debugmalloc.h"
 
-BoxNode *BoxNode_new(ExpNode *node)
-{
+BoxNode *BoxNode_new(ExpNode *node) {
 	BoxNode *self = (BoxNode *) malloc(sizeof(*self));
 	self->node = node;
 	self->global_pos.x = 0;
@@ -25,14 +24,12 @@ BoxNode *BoxNode_new(ExpNode *node)
 	return self;
 }
 
-void BoxNode_calc_global_position(BoxNode *self, const BoxNode *parent)
-{
+void BoxNode_calc_global_position(BoxNode *self, const BoxNode *parent) {
 	Vector_add_v(&self->global_pos, &parent->global_pos);
 	Vector_add_v(&self->global_pos, &self->offset);
 }
 
-void BoxNode_free(BoxNode *self)
-{
+void BoxNode_free(BoxNode *self) {
 	if (self->arg1_box)
 		BoxNode_free(self->arg1_box);
 	if (self->arg2_box)

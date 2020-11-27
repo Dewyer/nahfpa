@@ -1,8 +1,7 @@
 #include "AmfTextWidth.h"
 #include "debugmalloc.h"
 
-typedef struct AmfCharacterDefinition
-{
+typedef struct AmfCharacterDefinition {
 	char character;
 	int wx;
 } AmfCharacterDefinition;
@@ -103,16 +102,14 @@ static const AmfCharacterDefinition SUPPORTED_AMF_CHARACTERS[] = {
 		{'\0', 0}
 };
 
-void AmfTextWidth_build_character_map(AmfTextWidth *self)
-{
+void AmfTextWidth_build_character_map(AmfTextWidth *self) {
 	for (int ii = 0; SUPPORTED_AMF_CHARACTERS[ii].character != '\0'; ++ii) {
 		const AmfCharacterDefinition at = SUPPORTED_AMF_CHARACTERS[ii];
 		self->character_map[(int) at.character] = ii + 1;
 	}
 }
 
-double AmfTextWidth_char_width_calc(const AmfTextWidth *self, char cc, double font_size)
-{
+double AmfTextWidth_char_width_calc(const AmfTextWidth *self, char cc, double font_size) {
 	int ii = self->character_map[(int) cc];
 
 	if (ii != 0) {
@@ -123,7 +120,6 @@ double AmfTextWidth_char_width_calc(const AmfTextWidth *self, char cc, double fo
 	return 0.5 * font_size;
 }
 
-void AmfTextWidth_init(AmfTextWidth *self)
-{
+void AmfTextWidth_init(AmfTextWidth *self) {
 	AmfTextWidth_build_character_map(self);
 }

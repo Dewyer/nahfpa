@@ -55,4 +55,4 @@ add_executable(nahfpa
         src/svg_factory/BoxModelBuilder.c
         src/svg_factory/BoxModelBuilder.h
         src/svg_factory/AmfTextWidth.h
-        src/svg_factory/AmfTextWidth.c)
+        src/svg_factory/AmfTextWidth.c src/utils/brackets.c src/utils/brackets.h)

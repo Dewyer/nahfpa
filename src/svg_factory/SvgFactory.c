@@ -6,13 +6,13 @@
 #include <utils/geomerty.h>
 #include <utils/symbols_helper.h>
 #include <utils/rendering_constants.h>
+#include <utils/brackets.h>
 #include "SvgFactory.h"
 #include "debugmalloc.h"
 #include "BoxNode.h"
 #include "BoxModelBuilder.h"
 
-struct SvgFactory
-{
+struct SvgFactory {
 	Logger *logger;
 	BoxModelBuilder *box_model_builder;
 	BoxNode *box_tree_root;
@@ -20,8 +20,7 @@ struct SvgFactory
 	SvgFile *svg_file;
 };
 
-SvgFactory *SvgFactory_new(Logger *logger, ExpNode *exp_tree_root, char *out_file_path)
-{
+SvgFactory *SvgFactory_new(Logger *logger, ExpNode *exp_tree_root, char *out_file_path) {
 	SvgFactory *self = (SvgFactory *) malloc(sizeof(*self));
 	assert(self && "Couldn't allocate SvgFactory");
 
@@ -36,8 +35,7 @@ SvgFactory *SvgFactory_new(Logger *logger, ExpNode *exp_tree_root, char *out_fil
 
 void SvgFactory_render_node(SvgFactory *self, BoxNode *node);
 
-void SvgFactory_render_children(SvgFactory *self, BoxNode *node)
-{
+void SvgFactory_render_children(SvgFactory *self, BoxNode *node) {
 	if (node->arg1_box) {
 		BoxNode_calc_global_position(node->arg1_box, node);
 		SvgFactory_render_node(self, node->arg1_box);
@@ -62,8 +60,7 @@ void SvgFactory_render_children(SvgFactory *self, BoxNode *node)
 		}
 }
 
-void SvgFactory_render_frac(SvgFactory *self, BoxNode *box_node)
-{
+void SvgFactory_render_frac(SvgFactory *self, BoxNode *box_node) {
 	double delta_h = 0;
 	if (box_node->arg1_box)
 		delta_h += box_node->arg1_box->box.height + FRAC_LINE_HEIGHT / 2;
@@ -74,8 +71,7 @@ void SvgFactory_render_frac(SvgFactory *self, BoxNode *box_node)
 	SvgFile_add_line(self->svg_file, &p1, &p2);
 }
 
-void SvgFactory_render_sqrt(SvgFactory *self, BoxNode *box_node)
-{
+void SvgFactory_render_sqrt(SvgFactory *self, BoxNode *box_node) {
 	const Vector *sqrt_off = &SQRT_BOX_DELTA;
 	const double height = box_node->box.height;
 	const double width = box_node->box.width;
@@ -107,8 +103,7 @@ void SvgFactory_render_sqrt(SvgFactory *self, BoxNode *box_node)
 	SvgFile_add_line(self->svg_file, &up_s, &end_s);
 }
 
-void SvgFactory_render_sum_prod(SvgFactory *self, BoxNode *box_node)
-{
+void SvgFactory_render_sum_prod(SvgFactory *self, BoxNode *box_node) {
 	BoxNode *upper = box_node->arg1_box;
 	DString *text_sub = NULL;
 	Vector text_pos;
@@ -131,8 +126,7 @@ void SvgFactory_render_sum_prod(SvgFactory *self, BoxNode *box_node)
 		DString_free(text_sub);
 }
 
-void SvgFactory_render_lim(SvgFactory *self, BoxNode *box_node)
-{
+void SvgFactory_render_lim(SvgFactory *self, BoxNode *box_node) {
 	Vector pos;
 	pos.y = 0;
 	Box_horizontal_center(&pos, &LIM_SIZE, &box_node->box);
@@ -143,8 +137,7 @@ void SvgFactory_render_lim(SvgFactory *self, BoxNode *box_node)
 	DString_free(lim);
 }
 
-void SvgFactory_render_symbol(SvgFactory *self, BoxNode *box_node)
-{
+void SvgFactory_render_symbol(SvgFactory *self, BoxNode *box_node) {
 	SymbolDefinitionFindResults sym_res = SymbolDefinition_get_supported_results(box_node->node->value);
 	const char *sub = sym_res.is_uppercase ? sym_res.definition->uppercase_substitution
 										   : sym_res.definition->substitution;
@@ -155,8 +148,23 @@ void SvgFactory_render_symbol(SvgFactory *self, BoxNode *box_node)
 	DString_free(sub_ds);
 }
 
-void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
+void SvgFactory_render_brackets(SvgFactory *self, BoxNode *box_node)
 {
+	char *end = get_closing_bracket_for_bracket(box_node->node->value);
+	const double bracket_width = NORMAL_BRACKET_WIDTH;
+	DString *end_ds = DString_from_CString(end);
+	Vector bracket_pos;
+	Vector_add_v(&bracket_pos, &box_node->global_pos);
+
+	SvgFile_add_sized_text(self->svg_file, box_node->node->value, &bracket_pos, box_node->box.height);
+	bracket_pos.x += bracket_width+box_node->arg1_box->box.width;
+
+	SvgFile_add_sized_text(self->svg_file, end_ds, &bracket_pos, box_node->box.height);
+
+	DString_free(end_ds);
+}
+
+void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node) {
 	if (DEBUG_BOXES)
 		SvgFile_add_box(self->svg_file, &box_node->global_pos, &box_node->box); // Debug
 
@@ -174,11 +182,12 @@ void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node)
 		SvgFactory_render_sum_prod(self, box_node);
 	} else if (box_node->node->type == Lim) {
 		SvgFactory_render_lim(self, box_node);
+	} else if (box_node->node->type == Bracket) {
+		SvgFactory_render_brackets(self, box_node);
 	}
 }
 
-void SvgFactory_create(SvgFactory *self)
-{
+void SvgFactory_create(SvgFactory *self) {
 	BoxNode *box_root = BoxModelBuilder_build(self->box_model_builder);
 	self->box_tree_root = box_root;
 	Logger_log(self->logger, LogInfo, "Box model dimensions: w: %f, h: %f", box_root->box.width, box_root->box.height);
@@ -192,8 +201,7 @@ void SvgFactory_create(SvgFactory *self)
 	Logger_log(self->logger, LogInfo, "STEP 4. Rendering done.");
 }
 
-void SvgFactory_free(SvgFactory *self)
-{
+void SvgFactory_free(SvgFactory *self) {
 	if (self->box_tree_root)
 		BoxNode_free(self->box_tree_root);
 
