@@ -10,6 +10,11 @@ const tests = [
         title: "sum",
         description: "Sum offseted",
         script: "a + \\sum{10}"
-    }
+    },
+    {
+        title: "lim",
+        description: "Lim offseted",
+        script: "b + \\lim{10}"
+    },
 ];
 module.exports = {tests};
