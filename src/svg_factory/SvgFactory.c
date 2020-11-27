@@ -118,6 +118,7 @@ void SvgFactory_render_sum_prod(SvgFactory *self, BoxNode *box_node)
 		text_pos.y = upper->box.height + SUM_PROD_PADDING;
 
 	Box_horizontal_center(&text_pos, mid_size, &box_node->box);
+	Vector_add_v(&text_pos, &box_node->global_pos);
 
 	if (box_node->node->type == Sum)
 		text_sub = DString_from_CString("∑");
@@ -150,7 +151,6 @@ void SvgFactory_render_symbol(SvgFactory *self, BoxNode *box_node)
 
 	DString *sub_ds = DString_from_CString(sub);
 	Vector pos = box_node->global_pos;
-	pos.y = 0;
 	SvgFile_add_text(self->svg_file, sub_ds, &pos);
 	DString_free(sub_ds);
 }

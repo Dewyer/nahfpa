@@ -15,6 +15,7 @@ BoxNode *BoxNode_new(ExpNode *node)
 	self->offset.y = 0;
 	self->box.height = 0;
 	self->box.width = 0;
+	self->centering_axis_y = 0;
 
 	self->arg1_box = NULL;
 	self->arg2_box = NULL;

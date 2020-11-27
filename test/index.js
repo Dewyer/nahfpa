@@ -4,10 +4,12 @@ const fs = require('fs');
 const Handlebars = require("handlebars");
 const { tests } = require("./tests");
 const open = require('open');
+const dotenv = require("dotenv");
+dotenv.config();
 
 
 const root = path.resolve("../")
-const binary = `${root}\\cmake-build-debug\\nahfpa.exe`
+const binary = `${root}${process.env.BIN}`
 
 function execPromise(command)
 {
@@ -21,17 +23,27 @@ function execPromise(command)
 
 async function compileString(name, code)
 {
-    fs.writeFileSync("./artifacts/temp/inp.math", code);
-    const outName = `./artifacts/${name}.svg`;
-    let res = await execPromise(`${binary} -i ./artifacts/temp/inp.math -o ${outName} --color no`);
-    if (res.error === null)
-    {
-        return {
-            ...res,
-            code: fs.readFileSync(outName, {encoding: "utf-8"})
+    try{
+        fs.writeFileSync("./artifacts/temp/inp.math", code);
+        const outName = `./artifacts/${name}.svg`;
+    
+        let res = await execPromise(`${binary} -i ./artifacts/temp/inp.math -o ${outName} --color no`);
+        if (res.error === null)
+        {
+            return {
+                ...res,
+                code: fs.readFileSync(outName, {encoding: "utf-8"})
+            }
         }
+
+        return {...res, code: null};
     }
-    return {...res, code: null};
+    catch
+    {
+        console.error("exec failed");
+    }
+    
+    return {error: true, code: null};
 }
 
 function extractSizeFromStdout(stdout)

@@ -68,6 +68,7 @@ void BoxModelBuilder_build_index_box(BoxModelBuilder *self, BoxNode *box_node)
 	}
 	box_node->box.width = arg_offset + double_max(arg2_width, arg3_width);
 	box_node->box.height += box_node->arg1_box->box.height;
+	box_node->centering_axis_y = box_node->arg1_box->centering_axis_y + box_node->arg1_box->offset.y;
 }
 
 void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_node)
@@ -101,6 +102,7 @@ void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_nod
 	}
 
 	box_node->box.width -= gap;
+	box_node->centering_axis_y = box_node->box.height / 2.0;
 }
 
 void BoxModelBuilder_build_frac_box(BoxModelBuilder *self, BoxNode *box_node)
@@ -129,13 +131,15 @@ void BoxModelBuilder_build_frac_box(BoxModelBuilder *self, BoxNode *box_node)
 		Box_horizontal_center(&box_node->arg2_box->offset, &box_node->arg2_box->box, &box_node->box);
 		box_node->arg2_box->offset.y = (box_node->arg1_box ? box_node->arg1_box->box.height : 0) + line_height;
 	}
+
+	box_node->centering_axis_y = box_node->arg1_box ? box_node->arg1_box->offset.y : 0;
 }
 
 void BoxModelBuilder_build_box_for_sqrt(BoxModelBuilder *self, BoxNode *box_node)
 {
 	const Vector *delta = &SQRT_BOX_DELTA;
 
-	if (box_node->node->arg1) {
+	if (box_node->node->arg2) {
 		// TODO unimplemented
 		cassert(self->logger, false, "Sqrt with args not supported yet.");
 	} else {
@@ -144,6 +148,8 @@ void BoxModelBuilder_build_box_for_sqrt(BoxModelBuilder *self, BoxNode *box_node
 		Size_add_v(&box_node->box, delta);
 		Vector_add_v(&box_node->arg1_box->offset, delta);
 	}
+
+	box_node->centering_axis_y = box_node->box.height/2.0;
 }
 
 void BoxModelBuilder_build_prod_sum_box(BoxModelBuilder *self, BoxNode *box_node)
@@ -153,26 +159,32 @@ void BoxModelBuilder_build_prod_sum_box(BoxModelBuilder *self, BoxNode *box_node
 	box_node->box.height = sum_prod_size->height + SUM_PROD_PADDING * 2;
 	box_node->box.width = double_max(box_node->box.width, sum_prod_size->width);
 
-	if (box_node->arg1_box)
-		box_node->box.height += box_node->arg1_box->box.height;
+	if (box_node->arg1_box) {
+        box_node->box.height += box_node->arg1_box->box.height;
+        box_node->centering_axis_y += box_node->arg1_box->box.height;
+    }
 
 	if (box_node->arg2_box) {
 		box_node->arg2_box->offset.y = SUM_PROD_PADDING * 2 + sum_prod_size->height +
 									   (box_node->arg1_box ? box_node->arg1_box->box.height : 0);
 		box_node->box.height += box_node->arg2_box->box.height;
-	}
+        box_node->centering_axis_y += box_node->arg2_box->box.height / 2.0;
+    }
 }
 
 void BoxModelBuilder_build_lim_box(BoxModelBuilder *self, BoxNode *box_node)
 {
 	box_node->box.height = LIM_SIZE.height;
-	if (box_node->node->arg1)
+	box_node->box.width = LIM_SIZE.width;
+    box_node->centering_axis_y = LIM_SIZE.height / 2.0;
+
+    if (box_node->node->arg1)
 	{
 		box_node->arg1_box = BoxModelBuilder_build_box_for_node(self, box_node->node->arg1);
 		box_node->box.height += box_node->arg1_box->box.height + LIM_PADDING;
 		box_node->box.width = double_max(LIM_SIZE.width, box_node->arg1_box->box.width);
 		box_node->arg1_box->offset.y += LIM_SIZE.height + LIM_PADDING;
-		Box_horizontal_center(&box_node->arg1_box->offset, &box_node->arg1_box->box, &box_node->box);
+        Box_horizontal_center(&box_node->arg1_box->offset, &box_node->arg1_box->box, &box_node->box);
 	}
 }
 
@@ -187,12 +199,14 @@ void BoxModelBuilder_build_literal_box(BoxModelBuilder *self, BoxNode *box_node)
 															DString_char_at(box_node->node->value, ii), TEXT_HEIGHT);
 	}
 	box_node->box.width += length * LETTER_SPACING;
+	box_node->centering_axis_y = box_node->box.height / 2.0;
 }
 
 void BoxModelBuilder_build_symbol_box(BoxNode *box_node)
 {
 	SymbolDefinitionFindResults def = SymbolDefinition_get_supported_results(box_node->node->value);
 	box_node->box = def.is_uppercase ? def.definition->box_uppercase : def.definition->box;
+	box_node->centering_axis_y = box_node->box.height / 2.0;
 }
 
 BoxNode *BoxModelBuilder_build_box_for_node(BoxModelBuilder *self, ExpNode *exp_node)
