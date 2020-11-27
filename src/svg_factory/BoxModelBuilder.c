@@ -79,9 +79,10 @@ void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_nod
 	for (size_t ii = 0; ii < box_node->node->node_list->item_count; ++ii) {
 		ExpNode *at_node = List_get(box_node->node->node_list, ii);
 		BoxNode *at_box = BoxModelBuilder_build_box_for_node(self, at_node);
+        const double needed_height = 2*double_max(at_box->box.height - at_box->centering_axis_y, at_box->centering_axis_y);
 
-		if (box_node->box.height < at_box->box.height)
-			box_node->box.height = at_box->box.height;
+		if (box_node->box.height < needed_height)
+			box_node->box.height = needed_height;
 
 		at_box->offset.x = box_node->box.width;
 		box_node->box.width += at_box->box.width + gap;
@@ -97,8 +98,9 @@ void BoxModelBuilder_build_node_list_box(BoxModelBuilder *self, BoxNode *box_nod
 				Box_align_to_base_line(&at_box->offset, &at_box->box, &box_node->box);
 			else
 				at_box->offset.y = 0;
-		} else
-			Box_vertical_center(&at_box->offset, &at_box->box, &box_node->box);
+		} else {
+            at_box->offset.y = box_node->box.height/2.0 - at_box->centering_axis_y;
+        }
 	}
 
 	box_node->box.width -= gap;
@@ -132,7 +134,7 @@ void BoxModelBuilder_build_frac_box(BoxModelBuilder *self, BoxNode *box_node)
 		box_node->arg2_box->offset.y = (box_node->arg1_box ? box_node->arg1_box->box.height : 0) + line_height;
 	}
 
-	box_node->centering_axis_y = box_node->arg1_box ? box_node->arg1_box->offset.y : 0;
+	box_node->centering_axis_y = (box_node->arg1_box ? box_node->arg1_box->box.height : 0) + line_height/2.0;
 }
 
 void BoxModelBuilder_build_box_for_sqrt(BoxModelBuilder *self, BoxNode *box_node)
@@ -158,7 +160,7 @@ void BoxModelBuilder_build_prod_sum_box(BoxModelBuilder *self, BoxNode *box_node
 	BoxModelBuilder_build_frac_box(self, box_node);
 	box_node->box.height = sum_prod_size->height + SUM_PROD_PADDING * 2;
 	box_node->box.width = double_max(box_node->box.width, sum_prod_size->width);
-
+    box_node->centering_axis_y = 0;
 	if (box_node->arg1_box) {
         box_node->box.height += box_node->arg1_box->box.height;
         box_node->centering_axis_y += box_node->arg1_box->box.height;
@@ -168,8 +170,8 @@ void BoxModelBuilder_build_prod_sum_box(BoxModelBuilder *self, BoxNode *box_node
 		box_node->arg2_box->offset.y = SUM_PROD_PADDING * 2 + sum_prod_size->height +
 									   (box_node->arg1_box ? box_node->arg1_box->box.height : 0);
 		box_node->box.height += box_node->arg2_box->box.height;
-        box_node->centering_axis_y += box_node->arg2_box->box.height / 2.0;
     }
+    box_node->centering_axis_y += sum_prod_size->height/ 2.0;
 }
 
 void BoxModelBuilder_build_lim_box(BoxModelBuilder *self, BoxNode *box_node)
