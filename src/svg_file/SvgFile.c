@@ -10,8 +10,9 @@ struct SvgFile {
 
 const char *STYLE =
 		".text { font-family: 'Times new Roman', serif; fill: black; font-size: 30px; letter-spacing: 1px;}"
-		".line { stroke: black; }"
-		".box { stroke: red; fill: rgba(0,0,0,0) }";
+		".line { stroke: black; stroke-width: 2px; }"
+		".box { stroke: red; fill: rgba(0,0,0,0); }"
+  		".path { stroke: black; fill:rgba(0,0,0,0); stroke-width: 2px; }";
 
 SvgFile *SvgFile_new(FILE *file, Size *view_port) {
 	SvgFile *self = (SvgFile *) malloc(sizeof(*self));
@@ -54,16 +55,16 @@ void SvgFile_add_text(SvgFile *self, const DString *text, const Vector *pos) {
 	DString_free(escp_txt);
 }
 
-void SvgFile_add_sized_text(SvgFile *self, const DString *text, const Vector *pos, const double size) {
-	DString *escp_txt = SvgFile_escape_text(text);
-	fprintf(self->file, "\t<text class=\"text\" style=\"font-size: %fpx;\" x=\"%f\" y=\"%f\">%s</text>\n",size , pos->x,
-			pos->y + size,
-			DString_to_CString(escp_txt));
+void SvgFile_add_path(SvgFile *self, const char* format, ...)
+{
+	va_list args;
+	va_start (args, format);
 
-	DString_free(escp_txt);
+	fprintf(self->file, "\t<path class=\"path\" d=\"");
+	vfprintf(self->file, format, args);
+	fprintf(self->file, "\" />\n");
+	va_end (args);
 }
-
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths  quadratic
 
 void SvgFile_add_line(SvgFile *self, const Vector *p1, const Vector *p2) {
 	fprintf(self->file, "\t<line class=\"line\" x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" />\n", p1->x, p1->y, p2->x,

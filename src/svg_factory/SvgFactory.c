@@ -148,18 +148,65 @@ void SvgFactory_render_symbol(SvgFactory *self, BoxNode *box_node) {
 	DString_free(sub_ds);
 }
 
+void SvgFactory_render_normal_brackets(SvgFactory *self, BoxNode *box_node)
+{
+	Vector bracket_pos;
+	const double sw = NORMAL_BRACKET_STROKE_WIDTH;
+	const double bracket_width = NORMAL_BRACKET_WIDTH - sw;
+	const double mid_bw =  bracket_width/2.0;
+	const double bh = box_node->box.height - 2*sw;
+	const double *bsx = &bracket_pos.x;
+	const double *bsy = &bracket_pos.y;
+	Vector_add_v(&bracket_pos, &box_node->global_pos);
+	Vector_add(&bracket_pos, sw, sw);
+	bracket_pos.x += mid_bw;
+
+	SvgFile_add_path(self->svg_file, "M%f %f Q%f %f %f %f", *bsx, *bsy, *bsx-mid_bw, *bsy+bh/2, *bsx, *bsy+bh);
+	bracket_pos.x += bracket_width+box_node->arg1_box->box.width;
+	SvgFile_add_path(self->svg_file, "M%f %f Q%f %f %f %f", *bsx, *bsy, *bsx+mid_bw, *bsy+bh/2, *bsx, *bsy+bh);
+}
+
+void SvgFactory_render_square_brackets(SvgFactory *self, BoxNode *box_node)
+{
+	const double sw = NORMAL_BRACKET_STROKE_WIDTH;
+	const double bw = SQUARE_BRACKET_WIDTH - sw;
+	const double bh = box_node->box.height - 2*sw;
+	Vector bracket_pos;
+	Vector_add_v(&bracket_pos, &box_node->global_pos);
+	Vector_add(&bracket_pos, sw, sw);
+	bracket_pos.x += bw/2 -sw;
+
+	Vector top_r = bracket_pos;
+	Vector_add(&top_r, bw/2, 0);
+	Vector bot_l = bracket_pos;
+	Vector_add(&bot_l, 0, bh);
+	Vector bot_r = bracket_pos;
+	Vector_add(&bot_r, bw/2, bh);
+
+	SvgFile_add_line(self->svg_file, &bracket_pos, &top_r);
+	SvgFile_add_line(self->svg_file, &bracket_pos, &bot_l);
+	SvgFile_add_line(self->svg_file, &bot_l, &bot_r);
+
+	const double x_offset = box_node->arg1_box->box.width + bw/2;
+	bracket_pos.x += x_offset + bw;
+	top_r.x += x_offset;
+	bot_l.x += x_offset + bw;
+	bot_r.x += x_offset;
+
+	SvgFile_add_line(self->svg_file, &bracket_pos, &top_r);
+	SvgFile_add_line(self->svg_file, &bracket_pos, &bot_l);
+	SvgFile_add_line(self->svg_file, &bot_l, &bot_r);
+}
+
 void SvgFactory_render_brackets(SvgFactory *self, BoxNode *box_node)
 {
 	char *end = get_closing_bracket_for_bracket(box_node->node->value);
-	const double bracket_width = NORMAL_BRACKET_WIDTH;
 	DString *end_ds = DString_from_CString(end);
-	Vector bracket_pos;
-	Vector_add_v(&bracket_pos, &box_node->global_pos);
 
-	SvgFile_add_sized_text(self->svg_file, box_node->node->value, &bracket_pos, box_node->box.height);
-	bracket_pos.x += bracket_width+box_node->arg1_box->box.width;
-
-	SvgFile_add_sized_text(self->svg_file, end_ds, &bracket_pos, box_node->box.height);
+	if (DString_eq_CString(box_node->node->value, "("))
+		SvgFactory_render_normal_brackets(self, box_node);
+	else
+		SvgFactory_render_square_brackets(self, box_node);
 
 	DString_free(end_ds);
 }

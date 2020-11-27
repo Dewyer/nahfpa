@@ -19,6 +19,11 @@ void Vector_add_v(Vector *vector, const Vector *v2) {
 	vector->y += v2->y;
 }
 
+void Vector_add(Vector *vector, double x, double y) {
+	vector->x += x;
+	vector->y += y;
+}
+
 void Vector_negate(const Vector *vector, Vector *target) {
 	target->x = -vector->x;
 	target->y = -vector->y;

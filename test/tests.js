@@ -54,6 +54,16 @@ const tests = [
         title: "bracket2",
         description: "Bracket 2",
         script: "2 + (\\frac{123}{456})"  
+    },
+    {
+        title: "square",
+        description: "Bracket 2",
+        script: "1022 + [\\frac{123}{456}] + 42"
+    },
+    {
+        title: "identity2",
+        description: "Identity 2",
+        script: "e^z = \\lim{n \\to \\inf} (1+\\frac{z}{n})^n"
     }
 ];
 module.exports = {tests};

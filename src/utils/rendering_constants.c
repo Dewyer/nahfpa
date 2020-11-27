@@ -20,3 +20,5 @@ const Vector SQRT_BOX_DELTA = {20, 10};
 const Size LIM_SIZE = {40, 30};
 const double LIM_PADDING = 3;
 const double NORMAL_BRACKET_WIDTH = 10;
+const double NORMAL_BRACKET_STROKE_WIDTH = 2;
+const double SQUARE_BRACKET_WIDTH = 14;

@@ -11,7 +11,7 @@ SvgFile *SvgFile_new(FILE *file, Size *view_port);
 
 void SvgFile_add_text(SvgFile *self, const DString *text, const Vector *pos);
 
-void SvgFile_add_sized_text(SvgFile *self, const DString *text, const Vector *pos, const double size);
+void SvgFile_add_path(SvgFile *self, const char* format, ...);
 
 void SvgFile_add_line(SvgFile *self, const Vector *p1, const Vector *p2);
 

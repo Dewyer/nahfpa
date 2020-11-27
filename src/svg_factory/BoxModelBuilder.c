@@ -202,7 +202,7 @@ void BoxModelBuilder_build_symbol_box(BoxNode *box_node) {
 
 void BoxModelBuilder_build_bracket_box(BoxModelBuilder *self, BoxNode *box_node)
 {
-	const double bracket_width = NORMAL_BRACKET_WIDTH;
+	const double bracket_width = DString_eq_CString(box_node->node->value, "(") ? NORMAL_BRACKET_WIDTH : SQUARE_BRACKET_WIDTH;
 	cassert(self->logger, box_node->node->arg1 != NULL, "Bracket needs at least one argument");
 	box_node->arg1_box = BoxModelBuilder_build_box_for_node(self, box_node->node->arg1);
 	box_node->box.width = 2*bracket_width + box_node->arg1_box->box.width;

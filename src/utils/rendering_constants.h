@@ -24,5 +24,7 @@ extern const double TEXT_WIDTH;
 extern const double LETTER_SPACING;
 extern const double SQRT_TICK_HEIGHT_RATIO;
 extern const double NORMAL_BRACKET_WIDTH;
+extern const double NORMAL_BRACKET_STROKE_WIDTH;
+extern const double SQUARE_BRACKET_WIDTH;
 
 #endif //NAHFPA_RENDERING_CONSTANTS_H
