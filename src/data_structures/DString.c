@@ -62,10 +62,7 @@ char *DString_to_CString(const DString *self) {
 }
 
 size_t DString_len(const DString *self) {
-	if (self->data)
-		return (int) strlen(self->data);
-
-	return 0;
+	return self->length;
 }
 
 void DString_add_char(DString *self, char chr) {

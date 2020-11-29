@@ -23,38 +23,107 @@ urlcolor=cyan,
 \newcommand{\tbs}{\textbackslash}
 \newcommand{\tc}{\textasciicircum}
 
+\newcommand{\fn}[1]{\paragraph{#1}\mbox{}\\}
+
 \begin{document}
     \maketitle
     
     \section{A program felépítése}
     Az egész forráskód az \lang{/src} mappában van.
     A programomat kisebb modulokból építettem fel, ezek mellett vannak adat struktúrák is külön implementálva.
-    Ezek a pointereket tartalmazó linkelt lista, a \lang{List} és a dinamikus sztring a \lang{DString} (ez a későbbi még nem teljesen végleges, a későbbiekben C\# stílusura fogom átalakítani és nagyobb kapacitással fog rendelkezni mint a szükséges a fölösleges allokációk elkerülése végett.)
     A program részét képezi még a \lang{/utils} mappában levő segéd fileok, amik főleg definíciókat konstansokat és hasonló dolgokat tartalmaznak.
-    Az alábbiakban részletezem a forrásfileok melyik részeit tartalmazzák a programnak (a feladatkiírás szerint):
+
+    \subsection{Általános design pattern}
+    Az adatstruktúrák modulok nevei mind CamelCase-el vannak írva és példányosítandók a megfelelő \textbf{[nev]\_new} függvénnyel.
+    \textbf{[nev]\_[függvény név]} alakú függvények mind az adott struktúrához való példányon dolgozó függvények, amiknek ha szükségük van rá első argomentumuk egy pointer a struktúrára aminek a kontextusába dolgoznak.
+    Minden ilyenhez tartozik egy \textbf{[nev]\_free} függvény is, ez szabadítja fel az adatstruktúrát és minden általa tulajdonolt adatot (Nem minden adat ami része a kontextusnak tulajdona is).
+
+    Az alábbiakban részletezem a forrásfileok melyik részeit tartalmazzák a programnak illetve ezeken belül mik a főbb függvények és azok mit csinálnak:
     
     \subsection{data\_structures/DString}
-    Dinamikus sztring implementácó a fentebb leírtak szerint.
+    Dinamikus sztring implementácó ami csak akkor hív újabb dinamikus foglalást ha elérte a capacitását ami 2-es alapú exponenciálisan nő. (C\# stílusu implementáció, könyebb mindig kicist több memóriát foglalni mint ami kell mint minden módosításnál új helyet foglalni)
     A struktúra nem teljes, ezzel a mezők el vannak rejtve a felhasználóktól, ez egy tudatos dizájn döntés.
+    Továbbiakban CString elnevezés a c által használt null terminált karaktertömb pointer struktúrára utal.
+
+    \subsubsection{Főbb függvények}
+
+    \fn{DString *DString\_from\_CString(const char *str)}
+    Létrehoz egy új DString-et egy c- stílusu string ből másolással.
+
+    \fn{DString *DString\_from\_CString(const char *str)}
+    Visszatér az adott DString, CString alakú formájával.
+    Ez az átalakítás kell a c standard könyvtárhoz való kompatibilitáshoz.
+
+    \fn{size\_t DString\_len(const DString *self)}
+    Visszatér a DString effektív hosszával karakterekben (null karaktereket nem számolva).
+
+    \fn{void DString\_add\_char(DString *self, char chr)}
+    Hozzáad a DStringhez egy karaktert.
+
+    \fn{bool DString\_eq\_CString(const DString *string1, const char *string2)}
+    Összehasonlít egy DStringet meg egy CStringet, igazzal tér vissza ha strcmp szerint egyenlőek.
+
+    \fn{bool DString\_eq\_DString(const DString *string1, const DString *string2)}
+    Összehasonlít két DString-et, igazzal tér vissza ha strcmp szerint egyenlőek.
+
+    \fn{void DString\_concat(DString *self, const DString *string2)}
+    Konkatanál két DString-et, úgy hogy az elsőt módosítja.
+
+    \fn{void DString\_concat\_CString(DString *self, const char *string2)}
+    Konkatanál egy DString-et meg egy Cstring-et úgy hogy az elsőt módosítja.
+
+    \fn{char DString\_char\_at(const DString *self, size\_t ii)}
+    Visszatér a DString \textit{ii}-edik karakterével.
+
+    \fn{bool DString\_starts\_with(DString *self, char *string2)}
+    Ellenőrzi, hogy az adott DString a megadott CString-el kezdődik-e.
+    PL: almafa, és az alma bemenetekre igazat adna vissza.
+
+    \fn{DString *DString\_substring(const DString *self, size\_t start, size\_t end)}
+    Adott DString \textit{start} és \textit{end} indexei közötti részét adja vissza DString-ként. (Mind kettő index inklúzív)
+    Asszerciós hibát dob ha akármelyik index is kint van a DString határain.
 
     \subsection{data\_structures/List}
     Pointereket tartalmazó linkelt lista implementáció, definiál egy tisztán fejlesztési időben hasznos makrót a \lang{ListG}-t ami csak annyit tud, hogy a tipus meghatározásakor beleírhattam, hogy az adott list milyen tipusu pointereket tartalmaz.
     Ez az infó fordítás közben el van dobva.
 
-    \subsection{expression\_parser/ExpNode}
-    Ez a szubfolder a kifejezés feldolgozással foglalkozik, a kifejezés node a kifejezés fa adatstruktúrája, tartalmazza, hogy milyen argumentumai vannak a kifejezésnek, a tipusát és más hasznos információkat.
-    Itt van definiálva a kifejezés fa naplózásához használható függvény.
+    \fn{void List\_push(List *self, void *item)}
+    Hozzáfűz a listához egy pointert.
 
-    \subsection{expression\_parser/ExpParser}
-    Ez a konkrét kifejezés feldolgozó modull.
-    Ez használja a tokenizáló modult.
-    Működésének kimenete a nyelvi kifejezés fa.
-    
+    \fn{void *List\_get(const List *self, size\_t index)}
+    Visszatér a -edik elemmel a listában, ha nincsen ilyen elem null pointerrel tér vissza.
+
+    \fn{void List\_free\_2D(List *self, void (free\_item)(void *))}
+    Kétdimenziósan felszabadítja a listát, tehát felszabadítja a lista struktúráját és a tárolt adat pointert felszabadítja a megadott felszabadító függvénnyel.
+
+    \fn{void List\_free(List *self)}
+    Egydimenziósan felszabadítja a listát, tehát az adatpointerek által mutatott adatot nem szabadítja fel.
+
     \subsection{expression\_parser/TokenSlice}
     Egy segéd struktúra, ami definiálja a token listának egy indexekkel megadott szakaszát.
-    
+
+    \fn{TokenSlice *TokenSlice\_shrink\_clone(TokenSlice *slice)}
+    Lemásolja a szakaszt úgy, hogy a kezdő indexét megnöveli eggyel a végét pedig lerövidíti eggyel.
+
     \subsection{expression\_tokenizer/ExpTokenizer}
     Ezt a modult használja az ExpParser, egy egybefüggő sztringet vág szét használható szakaszokra.
+
+    \fn{List *ExpTokenizer\_tokenize(ExpTokenizer *self)}
+    Végrehajtja a tokenizálás a kontextusban megadott DString-en és visszaad egy DString pointer linkelt listát.
+
+    \subsection{expression\_parser/ExpNode}
+    Ez a szubfolder a kifejezés feldolgozással foglalkozik, a kifejezés node a kifejezés fa adatstruktúrája, tartalmazza, hogy milyen argumentumai vannak a kifejezésnek, a tipusát és más hasznos információkat.
+
+    \fn{void ExpNode\_log(const ExpNode *self, Logger *logger)}
+    Kinaplózzal a kifejezés node-ot a gyermekeivel együtt.
+
+    \subsection{expression\_parser/ExpParser}
+    Ez a konkrét kifejezés feldolgozó modul.
+    Ez használja a tokenizáló modult.
+    Működésének kimenete a nyelvi kifejezés fa.
+
+    \fn{TokenSlice *ExpParser_get_bracketed_slice(ExpParser *self, const DString *command, const DString *bracket, bool required, size_t start_i, size_t max_i)}
+    Thing.
 
     \subsection{logger/Logger}
     A naplózásért felelős modul, lehet megadni szinteket, illetve a létrehozásakor megadott konfiguráció szerint nem mindent ír ki, illetve fájlba is tud dolgozni.
