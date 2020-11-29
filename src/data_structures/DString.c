@@ -15,9 +15,6 @@ struct DString {
 	size_t length;
 };
 
-int ALLOC_CC = 0;
-int MAX_SS = 0;
-
 void DString_resize(DString *self, size_t length) {
 	self->length = length;
 	size_t min_capacity = length+1;
@@ -26,11 +23,8 @@ void DString_resize(DString *self, size_t length) {
 
 	double exp = double_max(ceil(log2(min_capacity)), 4);
 	double mem_step = pow(2, exp);
-	if (MAX_SS < mem_step)
-		MAX_SS = mem_step;
 
 	char *new_ptr = (char *) calloc(mem_step, sizeof(*new_ptr));
-	ALLOC_CC++;
 	assert(new_ptr && "DString couldn't alloc");
 
 	if (self->data) {
@@ -85,7 +79,6 @@ void DString_free(DString *self) {
 		free(self->data);
 
 	free(self);
-	printf("\nALLOC CC %d, max: %d", ALLOC_CC, MAX_SS);
 }
 
 DString *DString_clone(const DString *string) {
