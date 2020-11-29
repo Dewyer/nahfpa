@@ -25,18 +25,7 @@ urlcolor=cyan,
 
 \begin{document}
     \maketitle
-
-    \section{Mi van a programból kész?}
-    A programból kész van a CLI interfész nagy része, a bemenet még nincsen kezelve, a naplózás és a parancssoros argumentumok kezelése viszont kész van.
-    Tehát a program mindig csak a forráskódba beleégetett szövegből dolgozik.
-    A nyelvi feldolgozásból a tokenizáció és a kifejezés fa már el van készítve a program által, ez tán a legfontosabb fejlemény a fejlesztés ezen szakaszában.
-    A tokenizáció során a bemeneti forrás, érdemleges részekre van felvágva, ennek a részletei ki vannak naplózva.
-    Ezekből a részekből pedig fel van építve egy kifejezés fa, ami alapján lehet elkészíteni a doboz modell fát.
-    A legtöbb nyelvi funkció már támogatva van, kivéve a kommentek és a limesz.
-    A doboz modell fa már elkészül, még nem tökéletes sok egység értéket még meg kell majd változtatni, illetve hiányzik még a gyökjel, szumma, produktum, limesz, és szimbólumok nagy részének kirajzolása.
-    A doboz modell fának az a lényege, hogy megjelenítés előtt minden kiirandó elemről megtudjuk mekkora lesz a tartalmazó doboza, és a szüleétől való pozíció különbsége.
-    A projekt tartalmaz egy CMake filet, ennek a segítségével lehet buildelni.
-
+    
     \section{A program felépítése}
     Az egész forráskód az \lang{/src} mappában van.
     A programomat kisebb modulokból építettem fel, ezek mellett vannak adat struktúrák is külön implementálva.

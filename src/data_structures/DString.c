@@ -6,14 +6,31 @@
 #include <assert.h>
 #include "DString.h"
 #include "debugmalloc.h"
+#include <math.h>
+#include <utils/geomerty.h>
 
 struct DString {
 	size_t capacity;
 	char *data;
+	size_t length;
 };
 
-void DString_resize(DString *self, size_t new_size) {
-	char *new_ptr = (char *) calloc(new_size + 1, sizeof(*new_ptr));
+int ALLOC_CC = 0;
+int MAX_SS = 0;
+
+void DString_resize(DString *self, size_t length) {
+	self->length = length;
+	size_t min_capacity = length+1;
+	if (self->capacity >= min_capacity)
+		return;
+
+	double exp = double_max(ceil(log2(min_capacity)), 4);
+	double mem_step = pow(2, exp);
+	if (MAX_SS < mem_step)
+		MAX_SS = mem_step;
+
+	char *new_ptr = (char *) calloc(mem_step, sizeof(*new_ptr));
+	ALLOC_CC++;
 	assert(new_ptr && "DString couldn't alloc");
 
 	if (self->data) {
@@ -23,7 +40,7 @@ void DString_resize(DString *self, size_t new_size) {
 		new_ptr[0] = '\0';
 
 	self->data = new_ptr;
-	self->capacity = new_size;
+	self->capacity = mem_step;
 }
 
 DString *DString_new() {
@@ -32,18 +49,17 @@ DString *DString_new() {
 
 	new_ptr->capacity = 0;
 	new_ptr->data = NULL;
+	new_ptr->length = 0;
 
 	return new_ptr;
 }
 
 DString *DString_from_CString(const char *str) {
 	DString *ds = DString_new();
-	ds->capacity = strlen(str);
-	ds->data = (char *) calloc(ds->capacity + 1, sizeof(char));
-	assert(ds->data && "DString couldn't alloc");
+	size_t str_len = strlen(str);
+	DString_resize(ds, str_len);
 
 	strcpy(ds->data, str);
-
 	return ds;
 }
 
@@ -59,7 +75,7 @@ size_t DString_len(const DString *self) {
 }
 
 void DString_add_char(DString *self, char chr) {
-	DString_resize(self, self->capacity + 1);
+	DString_resize(self, self->length+1);
 	char temp[2] = {chr, '\0'};
 	strcat(self->data, temp);
 }
@@ -69,6 +85,7 @@ void DString_free(DString *self) {
 		free(self->data);
 
 	free(self);
+	printf("\nALLOC CC %d, max: %d", ALLOC_CC, MAX_SS);
 }
 
 DString *DString_clone(const DString *string) {
@@ -84,12 +101,12 @@ bool DString_eq_DString(const DString *string1, const DString *string2) {
 }
 
 void DString_concat(DString *self, const DString *string2) {
-	DString_resize(self, self->capacity + string2->capacity);
+	DString_resize(self, self->length + string2->length);
 	strcat(self->data, string2->data);
 }
 
 void DString_concat_CString(DString *self, const char *string2) {
-	DString_resize(self, self->capacity + strlen(string2));
+	DString_resize(self, self->length + strlen(string2));
 	strcat(self->data, string2);
 }
 
@@ -99,7 +116,7 @@ char DString_char_at(const DString *self, size_t ii) {
 }
 
 bool DString_starts_with(DString *self, char *string2) {
-	const size_t len = strlen(self->data);
+	const size_t len = self->length;
 	const size_t len2 = strlen(string2);
 
 	if (len2 > len)

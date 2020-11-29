@@ -1,0 +1,37 @@
+%! suppress = Unicode
+\documentclass[../spec.tex]{subfiles}
+
+\begin{document}
+
+    A program egy parancssori interfészen keresztül használható.
+    Ennek a működése parancsorban megadott argomentumokkal és zászlókkal irányítható.\\
+    Példa a program használatára: \lang{nahfpa.exe -i input.math -o out.svg}\\
+
+    \subsection{Naplózási szintek}\label{subsec:napló-szintek}
+    A program működése közben naplózási adatokat ad ki, a standard kimenetre vagy a megadott naplózási fileba.
+    A naplózásnak több szintje van:
+    \begin{itemize}
+        \item Infó : Információs adatok
+        \item Warn : Figyelmeztetések
+        \item Error : Hibák
+    \end{itemize}
+    Az adott naplózási információ tartalmától függ, hogy melyik szintben lesz kiadva.
+    A felhasználó kimenetre küldött naplózást szűrheti, például: Csak figyelmeztetéseket vagy hibákat írjon ki a program.
+
+    \subsection{Parancssori argumentumok}\label{subsec:args}
+    \begin{itemize}
+        \item -{}-input (-i) : Bemeneti fájl elérési útvonala | Standard bemenetről olvas be a program EOF jelig.
+        \item -{}-out (-o) : Kimeneti fájl elérési útvonala | Alap érték: \lang{out.svg}
+        \item -{}-log-level (-l) [szint] : A kimeneten megjelenő minimum naplózási szint beállítása, \lang{szint} lehetséges értékei: \lang{i, w, e} (Infó, Warning, Error) | Alap érték: Error
+        \item -{}-log-file (-lf) [fájl] : A naplózái fájl elérési útvonala | Standard kimentre naplózik a program.
+        \item -{}-color no : Kikapcsolja a szineket naplózásnál.
+        \item -{}-help: Kiírja a program használati leírását, ha ez az argomentum használva van a program nem végez semmilyen fordítást és a többi argomentumot ignorálja.
+    \end{itemize}
+    | jel után lévő részek azt tartalmazzák, hogy mi történik ha a felhasználó nem adja meg az adott argomentumot.
+    Zárójelben lévő verziói az argumentumoknak a rövidett változatok, ugyan úgy működnek mint a hosszabbak.
+    
+    \begin{center}
+        Példa: \textit{nahfpa -i input.math -o out.svg -l warning}
+    \end{center}
+
+\end{document}

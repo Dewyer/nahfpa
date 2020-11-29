@@ -19,12 +19,23 @@ function execPromise(command) {
     })
 }
 
+async function rastarize(file)
+{
+    try
+    {
+        const cmd = `svgexport ./artifacts/${file}.svg ./artifacts/png/${file}.png  1.5x`;
+        await execPromise(cmd);
+    }   
+    catch
+    {}
+}
+
 async function compileString(name, code) {
     try {
         fs.writeFileSync("./artifacts/temp/inp.math", code);
         const outName = `./artifacts/${name}.svg`;
-
         let res = await execPromise(`${binary} -i ./artifacts/temp/inp.math -o ${outName} --color no`);
+
         if (res.error === null) {
             return {
                 ...res,
@@ -59,6 +70,10 @@ async function runTests() {
     for (let tt of tests) {
         const compRes = await compileString(tt.title, tt.script);
         const size = extractSizeFromStdout(compRes.stdout);
+        
+        if (process.argv.includes("ras"))
+            await rastarize(tt.title);
+
         ranTests.push({
             no: `${cc + 1}/${tests.length}`,
             ...tt,

@@ -164,6 +164,12 @@ void BoxModelBuilder_build_prod_sum_box(BoxModelBuilder *self, BoxNode *box_node
 									   (box_node->arg1_box ? box_node->arg1_box->box.height : 0);
 		box_node->box.height += box_node->arg2_box->box.height;
 	}
+
+	if (box_node->arg1_box)
+		Box_horizontal_center(&box_node->arg1_box->offset, &box_node->arg1_box->box, &box_node->box);
+	if (box_node->arg2_box)
+		Box_horizontal_center(&box_node->arg2_box->offset, &box_node->arg2_box->box, &box_node->box);
+
 	box_node->centering_axis_y += sum_prod_size->height / 2.0;
 }
 

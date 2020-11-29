@@ -1,0 +1,21 @@
+\contentsline {section}{\numberline {1}Mi a program ?}{1}{section.1}%
+\contentsline {section}{\numberline {2}Leíró nyelv}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Kifejezésekről álltalánosan}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Literálok}{2}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Egyszerű operátorok}{2}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Szöveg parancs}{3}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Emeletes tört parancs}{3}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Gyökjel parancs}{3}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Felső index operátor}{3}{subsection.2.7}%
+\contentsline {subsection}{\numberline {2.8}Alsó index operátor}{4}{subsection.2.8}%
+\contentsline {subsection}{\numberline {2.9}Index operátor}{4}{subsection.2.9}%
+\contentsline {subsection}{\numberline {2.10}Szumma parancs}{4}{subsection.2.10}%
+\contentsline {subsection}{\numberline {2.11}Produktum parancs}{5}{subsection.2.11}%
+\contentsline {subsection}{\numberline {2.12}Szimbólumok}{5}{subsection.2.12}%
+\contentsline {subsection}{\numberline {2.13}Limesz parancs}{7}{subsection.2.13}%
+\contentsline {subsection}{\numberline {2.14}Kommentek}{7}{subsection.2.14}%
+\contentsline {subsection}{\numberline {2.15}Whitespace}{7}{subsection.2.15}%
+\contentsline {section}{\numberline {3}Parancssori interfész}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Naplózási szintek}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Parancssori argumentumok}{8}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Végszó}{8}{section.4}%
