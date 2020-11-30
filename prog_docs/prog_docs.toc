@@ -1,0 +1,60 @@
+\contentsline {section}{\numberline {1}A program felépítése}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Általános design pattern}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}data\_structures/DString}{2}{subsection.1.2}%
+\contentsline {paragraph}{DString *DString\_from\_CString(const char *str)}{2}{section*.2}%
+\contentsline {paragraph}{DString *DString\_from\_CString(const char *str)}{2}{section*.3}%
+\contentsline {paragraph}{size\_t DString\_len(const DString *self)}{2}{section*.4}%
+\contentsline {paragraph}{void DString\_add\_char(DString *self, char chr)}{2}{section*.5}%
+\contentsline {paragraph}{bool DString\_eq\_CString(const DString *string1, const char *string2)}{2}{section*.6}%
+\contentsline {paragraph}{bool DString\_eq\_DString(const DString *string1, const DString *string2)}{2}{section*.7}%
+\contentsline {paragraph}{void DString\_concat(DString *self, const DString *string2)}{3}{section*.8}%
+\contentsline {paragraph}{void DString\_concat\_CString(DString *self, const char *string2)}{3}{section*.9}%
+\contentsline {paragraph}{char DString\_char\_at(const DString *self, size\_t ii)}{3}{section*.10}%
+\contentsline {paragraph}{bool DString\_starts\_with(DString *self, char *string2)}{3}{section*.11}%
+\contentsline {paragraph}{DString *DString\_substring(const DString *self, size\_t start, size\_t end)}{3}{section*.12}%
+\contentsline {subsection}{\numberline {1.3}data\_structures/List}{3}{subsection.1.3}%
+\contentsline {paragraph}{void List\_push(List *self, void *item)}{3}{section*.13}%
+\contentsline {paragraph}{void *List\_get(const List *self, size\_t index)}{3}{section*.14}%
+\contentsline {paragraph}{void List\_free\_2D(List *self, void (free\_item)(void *))}{3}{section*.15}%
+\contentsline {paragraph}{void List\_free(List *self)}{3}{section*.16}%
+\contentsline {subsection}{\numberline {1.4}expression\_parser/TokenSlice}{4}{subsection.1.4}%
+\contentsline {paragraph}{TokenSlice *TokenSlice\_shrink\_clone(TokenSlice *slice)}{4}{section*.17}%
+\contentsline {subsection}{\numberline {1.5}expression\_tokenizer/ExpTokenizer}{4}{subsection.1.5}%
+\contentsline {paragraph}{List *ExpTokenizer\_tokenize(ExpTokenizer *self)}{4}{section*.18}%
+\contentsline {subsection}{\numberline {1.6}expression\_parser/ExpNode}{4}{subsection.1.6}%
+\contentsline {paragraph}{void ExpNode\_log(const ExpNode *self, Logger *logger)}{5}{section*.19}%
+\contentsline {subsection}{\numberline {1.7}expression\_parser/ExpParser}{5}{subsection.1.7}%
+\contentsline {paragraph}{TokenSlice *ExpParser\_get\_bracketed\_slice(ExpParser *self, const DString *command, const DString *bracket, bool required, size\_t start\_i, size\_t max\_i)}{5}{section*.20}%
+\contentsline {paragraph}{TokenSlice *ExpParser\_parse\_command\_args(ExpParser *self, ExpNode *command, int required\_args, int max\_args, size\_t args\_start, size\_t max\_i)}{5}{section*.21}%
+\contentsline {paragraph}{ExpNode *ExpParser\_parse\_command(ExpParser *self, DString *command, size\_t command\_start, size\_t max\_i)}{6}{section*.22}%
+\contentsline {paragraph}{ExpNode *ExpParser\_parse\_node\_list(ExpParser *self, TokenSlice *slice)}{6}{section*.23}%
+\contentsline {paragraph}{ExpNode *ExpParser\_parse(ExpParser *self)}{6}{section*.24}%
+\contentsline {subsection}{\numberline {1.8}logger/Logger}{6}{subsection.1.8}%
+\contentsline {paragraph}{Logger *Logger\_new(LogLevel min\_level, char *out\_path, bool use\_color)}{6}{section*.25}%
+\contentsline {paragraph}{void Logger\_log(Logger *self, LogLevel level, char *format, ...)}{6}{section*.26}%
+\contentsline {subsection}{\numberline {1.9}nahfpa\_cli/NahfpaCli}{6}{subsection.1.9}%
+\contentsline {paragraph}{CliMode NahfpaCli\_parse\_args\_get\_cli\_mode(NahfpaCli *self)}{7}{section*.27}%
+\contentsline {paragraph}{DString *NahfpaCli\_read\_input(NahfpaCli *self)}{7}{section*.28}%
+\contentsline {subsection}{\numberline {1.10}svg\_factory/BoxModelBuilder}{7}{subsection.1.10}%
+\contentsline {paragraph}{BoxNode *BoxModelBuilder\_build\_box\_for\_node(BoxModelBuilder *self, ExpNode *exp\_node)}{8}{section*.29}%
+\contentsline {subsection}{\numberline {1.11}svg\_factory/AmfTextWidth}{8}{subsection.1.11}%
+\contentsline {paragraph}{double AmfTextWidth\_char\_width\_calc(const AmfTextWidth *self, char cc, double font\_size)}{8}{section*.30}%
+\contentsline {subsection}{\numberline {1.12}svg\_file/SvgFile}{8}{subsection.1.12}%
+\contentsline {paragraph}{void SvgFile\_add\_text(SvgFile *self, const DString *text, const Vector *pos)}{9}{section*.31}%
+\contentsline {paragraph}{void SvgFile\_add\_path(SvgFile *self, const char* format, ...)}{9}{section*.32}%
+\contentsline {paragraph}{void SvgFile\_add\_line(SvgFile *self, const Vector *p1, const Vector *p2)}{9}{section*.33}%
+\contentsline {paragraph}{void SvgFile\_add\_box(SvgFile *self, const Vector *pp, const Size *size)}{9}{section*.34}%
+\contentsline {subsection}{\numberline {1.13}svg\_factory/SvgFactory}{9}{subsection.1.13}%
+\contentsline {paragraph}{void SvgFactory\_render\_node(SvgFactory *self, BoxNode *box\_node)}{9}{section*.35}%
+\contentsline {subsection}{\numberline {1.14}utils/brackets}{9}{subsection.1.14}%
+\contentsline {paragraph}{char *get\_closing\_bracket\_for\_bracket(const DString *bracket)}{9}{section*.36}%
+\contentsline {subsection}{\numberline {1.15}utils/cassert}{9}{subsection.1.15}%
+\contentsline {paragraph}{void cassert(Logger *log\_inst, int exp, char *msg, ...)}{9}{section*.37}%
+\contentsline {subsection}{\numberline {1.16}utils/geometry}{9}{subsection.1.16}%
+\contentsline {subsection}{\numberline {1.17}utils/help\_text}{10}{subsection.1.17}%
+\contentsline {subsection}{\numberline {1.18}utils/rendering\_constants}{10}{subsection.1.18}%
+\contentsline {subsection}{\numberline {1.19}utils/symbols\_helper}{10}{subsection.1.19}%
+\contentsline {paragraph}{SymbolDefinitionFindResults SymbolDefinition\_get\_supported\_results(DString *command)}{10}{section*.38}%
+\contentsline {section}{\numberline {2}Test Suite}{10}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Használat}{11}{subsection.2.1}%
+\contentsline {section}{\numberline {3}Összefoglaló}{11}{section.3}%

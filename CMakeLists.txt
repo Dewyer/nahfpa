@@ -36,8 +36,6 @@ add_executable(nahfpa
         src/utils/help_txt.h
         src/utils/help_txt.c
         src/utils/help_txt.h
-        src/utils/test_script.c
-        src/utils/test_script.h
         src/expression_parser/TokenSlice.c
         src/expression_parser/TokenSlice.h
         src/utils/symbols_helper.c

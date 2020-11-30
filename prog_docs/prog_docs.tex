@@ -15,9 +15,9 @@ filecolor=magenta,
 urlcolor=cyan,
 }
 
-\title{Félkész Jelentés}
+\title{Programozói Dokumentáció}
 \author{Rátki Barnabás}
-\date{2020.11.15}
+\date{2020.11.29}
 
 \newcommand{\lang}[1]{\textit{#1}}
 \newcommand{\tbs}{\textbackslash}
@@ -25,8 +25,12 @@ urlcolor=cyan,
 
 \newcommand{\fn}[1]{\paragraph{#1}\mbox{}\\}
 
+\renewcommand*\contentsname{Tartalomjegyzék}
+
 \begin{document}
     \maketitle
+
+    \tableofcontents
     
     \section{A program felépítése}
     Az egész forráskód az \lang{/src} mappában van.
@@ -45,10 +49,8 @@ urlcolor=cyan,
     A struktúra nem teljes, ezzel a mezők el vannak rejtve a felhasználóktól, ez egy tudatos dizájn döntés.
     Továbbiakban CString elnevezés a c által használt null terminált karaktertömb pointer struktúrára utal.
 
-    \subsubsection{Főbb függvények}
-
     \fn{DString *DString\_from\_CString(const char *str)}
-    Létrehoz egy új DString-et egy c- stílusu string ből másolással.
+    Létrehoz egy új DString-et egy CString-ből másolással.
 
     \fn{DString *DString\_from\_CString(const char *str)}
     Visszatér az adott DString, CString alakú formájával.
@@ -102,17 +104,71 @@ urlcolor=cyan,
     \subsection{expression\_parser/TokenSlice}
     Egy segéd struktúra, ami definiálja a token listának egy indexekkel megadott szakaszát.
 
+    \begin{center}
+        \begin{tabular}{ | p{5.5cm} || p{5.5cm} | }
+            \hline
+            \textbf{Tipus / Név} & Leírás \\
+            \hline
+            \textbf{size\_t start} & Kezdő indexe a szakasznak\\
+            \hline
+            \textbf{size\_t end} & Vég indexe a szakasznak \\
+            \hline
+        \end{tabular}\\
+        \textit{struct TokenSlice}
+    \end{center}
+
     \fn{TokenSlice *TokenSlice\_shrink\_clone(TokenSlice *slice)}
-    Lemásolja a szakaszt úgy, hogy a kezdő indexét megnöveli eggyel a végét pedig lerövidíti eggyel.
+    Lemásolja a szakaszt úgy, hogy a kezdő indexét megnöveli eggyel a végéből pedig levon egyet.
 
     \subsection{expression\_tokenizer/ExpTokenizer}
     Ezt a modult használja az ExpParser, egy egybefüggő sztringet vág szét használható szakaszokra.
 
     \fn{List *ExpTokenizer\_tokenize(ExpTokenizer *self)}
     Végrehajtja a tokenizálás a kontextusban megadott DString-en és visszaad egy DString pointer linkelt listát.
+    A bemeneti nyers szövegen átmegy karakterenként, a feldolgozás alatt mindig van egy aktív buffer (\textit{DString *last\_token\_buffer}).
+    Attól függően, hogy mi a jelenlegi karakter 3 dolog történhet.
+    Ha a karakter whitespace akkor nem fűzzük hozzá a bufferhez és a hozzáadjuk a tokenek listájához majd kitöröljük a tartalmát (továbbiakban: flush).
+    Ha a karakter egy egykarakteres operátor (Pl: *, +, -) akkor flush történik és utána fűződik hozzá a jelenlegi karakter a bufferhez majd ujra flush történik.
+    Ha a karakter \textit{\textbackslash} akkor flusholunk és hozzáadjuk a jelenlegi karaktert a bufferhez.
+    Ez a procedúra azt is elmenti egy listába, hogy az adott token utsó karaktere melyik indexen volt a nyers szövegben.
 
     \subsection{expression\_parser/ExpNode}
     Ez a szubfolder a kifejezés feldolgozással foglalkozik, a kifejezés node a kifejezés fa adatstruktúrája, tartalmazza, hogy milyen argumentumai vannak a kifejezésnek, a tipusát és más hasznos információkat.
+    \begin{center}
+        \begin{tabular}{ | p{5.5cm} || p{5.5cm} | }
+            \hline
+            \textbf{Tipus / Név} & Leírás \\
+            \hline
+            \textbf{ExpNodeType type} & A tipusa a kifejezés node-nak\\
+            \hline
+            \textbf{struct ExpNode *arg1} & Első pozícionális argomentum\\
+            \hline
+            \textbf{struct ExpNode *arg2} & Második pozícionális argomentum\\
+            \hline
+            \textbf{struct ExpNode *arg3} & Harmadik pozícionális argomentum\\
+            \hline
+            \textbf{ListG(struct ExpNode) *node\_list} & Linkelt node lista gyermekek\\
+            \hline
+            \textbf{DString *value} & Sztring érték a kifejezéshez, például a literál tartalma\\
+            \hline
+            \textbf{TokenSlice *origin} & Ezen a fa ezen részfája melyik részéből lett létrehozva a tokenlistának\\
+            \hline
+            \textbf{struct ExpNode *parent} & Node aminek a gyereke ez a node\\
+            \hline
+        \end{tabular}\\
+        \textit{struct ExpNode}\\
+        \textit{enum ExpNodeType { Index,
+        NodeList,
+        Symbol,
+        Literal,
+        Frac,
+        Sqrt,
+        Sum,
+        Prod,
+        Lim,
+        Comment,
+        Bracket}}
+    \end{center}
 
     \fn{void ExpNode\_log(const ExpNode *self, Logger *logger)}
     Kinaplózzal a kifejezés node-ot a gyermekeivel együtt.
@@ -122,25 +178,151 @@ urlcolor=cyan,
     Ez használja a tokenizáló modult.
     Működésének kimenete a nyelvi kifejezés fa.
 
-    \fn{TokenSlice *ExpParser_get_bracketed_slice(ExpParser *self, const DString *command, const DString *bracket, bool required, size_t start_i, size_t max_i)}
-    Thing.
+    \fn{TokenSlice *ExpParser\_get\_bracketed\_slice(ExpParser *self, const DString *command, const DString *bracket, bool required, size\_t start\_i, size\_t max\_i)}
+    Ez a függvény a token lista alapján egy adott parancshoz a megadott zárójel tipus (\textit{DString *bracket}) által közbezárt token lista részt.
+    Ami a \text{start\_i} nél kezdődik és maximum \textit{max\_i}-ig tart.
+    Ha a slice nem kötelező és nem található a megadott indexnél kezdődő pozíciótol a megfelelő zárójellel közbezárt rész akkor a függvény \textit{NULL}-al tér vissza.
+
+    Ezt a függvényt használja mind a command argomentumok (\textit{\{}, \textit{\}}) mind a rendes zárójelek sliceját kiszámoló procedúrák.
+
+    \fn{TokenSlice *ExpParser\_parse\_command\_args(ExpParser *self, ExpNode *command, int required\_args, int max\_args, size\_t args\_start, size\_t max\_i)}
+    Egy ismert parancshoz parse-olja az argomentumait, a kötelező argomentumok (\textit{int required\_args}) számánál kevesebb mennyiségő argomentum, vagy maximumnál-nál (\textit{int max\_args}) több argomentum esetén hibába ütközik a fordítás.
+    A feldolgozás az inklúzív \textit{size\_t args\_start} indexnél kezdődik.
+
+    \fn{ExpNode *ExpParser\_parse\_command(ExpParser *self, DString *command, size\_t command\_start, size\_t max\_i)}
+    A megadott parancs sztring (pl: \\frac), ból és a kezdő indexből visszatér a teljesen parseolt command-al.
+    Csak támogatott command sztring lehet megadva.
+
+    \fn{ExpNode *ExpParser\_parse\_node\_list(ExpParser *self, TokenSlice *slice)}
+    Az egyik legfontosabb függvénye a modulnak, maga a gyökér kifejezés node is \textit{NodeList} tipusu.
+    Ez indítja a rekurzív parsoló hívás sort, adva a token listában a konrkét slice amit fel kell dolgoznia, meghívja a további parsoló függvényeket, amik vagy ujrahívják a node lista feldolgozó függvényt, mert tartalmaznak újabb szinteket, vagy szimplán visszatérnek egy olyan ággal aminek nincsen több gyereke.
+
+    \fn{ExpNode *ExpParser\_parse(ExpParser *self)}
+    Elindítja az almodul segítségével a tokenizálást majd végrehajta a parseolást és visszatér a gyökér node pointerével.
 
     \subsection{logger/Logger}
     A naplózásért felelős modul, lehet megadni szinteket, illetve a létrehozásakor megadott konfiguráció szerint nem mindent ír ki, illetve fájlba is tud dolgozni.
+
+    \fn{Logger *Logger\_new(LogLevel min\_level, char *out\_path, bool use\_color)}
+    Példányosítja a modult, \textit{char *out\_path} lehet \textit{NULL} ha az akkor a kimenet a standard kimenetre kerül, ha meg van adva akkor a megadott elérési úton lévő fileba, ebben az esetben nincsenek szinek használva
+    Ha \textit{bool use\_color} hamis akkor semmikép nincsenek szinek használva.
+
+    \fn{void Logger\_log(Logger *self, LogLevel level, char *format, ...)}
+    Végrehajta a naplózási infók kiírását a megadott fileba vagy a standard kimenetre a megadott naplózási szinten.
+    Ha a minimum naplózási szintnél alacsonyabb szintű hívás történik akkor az nem fog semmilyen kimenetet létrehozni.
 
     \subsection{nahfpa\_cli/NahfpaCli}
     A program főmodulja.
     Bemeneti a parancssoros argumentumok száma és értéke, ez hajta végre a fordítást és ehhez használja a kifejezés parszer modult és az svg gyártó modult.
 
-    \subsection{svg\_factory/SVGFactory}
-    A kifejezésfából először a box modell modul felhasználásával box modell fát, majd abból egy svg fájlt hoz létre.
-    Az SvgFile modult használja a fájl létrehozására.
+    \begin{center}
+        \begin{tabular}{ | p{5.5cm} || p{5.5cm} | }
+            \hline
+            \textbf{Tipus / Név} & Leírás \\
+            \hline
+            \textbf{int arg\_count} & Parancssori argomentumok száma\\
+            \hline
+            \textbf{char **args} & Parancssori argomentumok kétdimenziós tömbje\\
+            \hline
+            \textbf{char *input\_file\_path} & Bemeneti file elérési útvonala *\\
+            \hline
+            \textbf{char *out\_file\_path} & Kimeneti SVG elérési útvonala *\\
+            \hline
+            \textbf{char *need\_color} & Szín kapcsolóba megadott szöveg tartalma *\\
+            \hline
+            \textbf{LogLevel min\_log\_level} & Minimum naplózási szint ami a Logger példánynak tovább lesz adva *\\
+            \hline
+            \textbf{Logger *pre\_logger} & Logger inicializálása előtt használt naplózási modul példány\\
+            \hline
+            \textbf{Logger *logger} & Összes függő modulnak továbbadott Logger singeleton *\\
+            \hline
+        \end{tabular}\\
+        \textit{struct NahfpaCli}\\
+        \textit{* -- Argomentum parsolás után feltöltött}
+    \end{center}
+
+    \fn{CliMode NahfpaCli\_parse\_args\_get\_cli\_mode(NahfpaCli *self)}
+    Parszolja a kontextusban megadott cli argomentumokat, és betölti ez értékiket.
+    Visszaadja a CliMode-ot is, ami azt indikálja, hogy a program fordítási módban lett elindítva, vagy megtalálható a \textit{help} flag, ami miatt csak az információs szöveg kerül kiírásra.
+
+    \fn{DString *NahfpaCli\_read\_input(NahfpaCli *self)}
+    Beolvassa a feldolgozandó szkriptet, vagy a standard bemenetről vagy a megadott fileból.
+    Ha a kontextusban a beolvasandó file elérési útvonala \textit{NULL} akkor a standard bemenetről olvas.
+
+    \subsection{svg\_factory/BoxModelBuilder}
+    Ez a modul építí fel a kifejezés fa alapján a doboz fát aminek elemei a \textit{BoxNode}-ok.
+
+    \begin{center}
+        \begin{tabular}{ | p{5.5cm} || p{5.5cm} | }
+            \hline
+            \textbf{Tipus / Név} & Leírás \\
+            \hline
+            \textbf{Vector offset} & Relatív pozíció a szülőhöz képest\\
+            \hline
+            \textbf{Vector global\_pos} & Abszolút kordinátái a node-nak -- Csak a teljes fa felépítése után töltődik fel\\
+            \hline
+            \textbf{Size box} & Doboz mérete\\
+            \hline
+            \textbf{double centering\_axis\_y} & A doboz vertikális középre helyezéséhez használt relatív pozíció\\
+            \hline
+            \textbf{struct BoxNode *arg1\_box} & Első pozícionális argomentum doboza\\
+            \hline
+            \textbf{struct BoxNode *arg2\_box} & Második pozícionális argomentum doboza\\
+            \hline
+            \textbf{struct BoxNode *arg3\_box} & Harmadik pozícionális argomentum doboza\\
+            \hline
+            \textbf{ListG(struct BoxNode) *node\_list\_box} & Kifejezés lista dobozai\\
+            \hline
+            \textbf{ExpNode *node} & A kifejezés node amiből a doboz származik\\
+            \hline
+        \end{tabular}\\
+        \textit{struct BoxNode}\\
+    \end{center}
+
+    \fn{BoxNode *BoxModelBuilder\_build\_box\_for\_node(BoxModelBuilder *self, ExpNode *exp\_node)}
+    A modul legfontosabb függvénye, a rekurzív box fa építő hívás sor kezdete, a node tipusa alaján tovább hív másik függvényekbe amik már a renderelés részletei alapján kiszánolják az offsetet és a doboz méretét.
+
+    \subsection{svg\_factory/AmfTextWidth}
+    Ez a modul egy Helvetica karakter szélességét számítja ki egy adott magassághoz, egy AMF file tartalma van rögzítve egy tömbbe (\textit{SUPPORTED\_AMF\_CHARACTERS}).
+    Optimalizációs céllal ebből a tömbből egy map van létrehozva, mivel tudjuk, hogy a kereshető karakterek egyértelműen leképezhetőek unsigned short ként.
+
+    \fn{double AmfTextWidth\_char\_width\_calc(const AmfTextWidth *self, char cc, double font\_size)}
+    Egy adott karakterhez és magassághoz kiszámítja a szélességet, használva a fent említett mappot.
 
     \subsection{svg\_file/SvgFile}
     Ez a modul absztraktálja az svg generálás részleteit.
+    Megtartja az SVG működésének szabályait, a kordináta rendszer origója a bal felső sarok.
+    Minden taghez egy meghatározott stílus osztályt használ, ezek a stílusok a \textit{const char *STYLE} globális változóban vannak definiálva.
+
+    \fn{void SvgFile\_add\_text(SvgFile *self, const DString *text, const Vector *pos)}
+    Létrehoz egy \textit{text} tag-et, a megadott kordinátáknál a szöveg magasságának korrigálásával (Tehát a szöveg bal felső sarka lesz a megadott kordináta mint minden más SVG objektumnál).
+    A szöveg SVG escapelve van kiírás előtt.
+
+    \fn{void SvgFile\_add\_path(SvgFile *self, const char* format, ...)}
+    Létrehoz egy \textit{path} tag-et, a path argomentuma a tagnek egy varg formázható sztring (\textit{char *format}).
+
+    \fn{void SvgFile\_add\_line(SvgFile *self, const Vector *p1, const Vector *p2)}
+    Létrehoz egy \textit{line} tag-et, a megadott kordináták között.
+
+    \fn{void SvgFile\_add\_box(SvgFile *self, const Vector *pp, const Size *size)}
+    Létrehoz egy \textit{box} tag-et, a megadott kordinátánál a megadott mérettel.
+
+    \subsection{svg\_factory/SvgFactory}
+    A kifejezésfából először a box modell modul felhasználásával box modell fát, majd abból egy svg fájlt hoz létre.
+    Az SvgFile modult használja a fájl létrehozására.
+
+    \fn{void SvgFactory\_render\_node(SvgFactory *self, BoxNode *box\_node)}
+    Kirenderel egy adott box node-ot a gyermekeivel együtt, meghív minden tipushoz egy segédfüggvényt.
+
+    \subsection{utils/brackets}
+
+    \fn{char *get\_closing\_bracket\_for\_bracket(const DString *bracket)}
+    Segédfügvény ami egy adott zárójelhez visszaadja a záró párját.
 
     \subsection{utils/cassert}
-    Egy rövid függvényt definiál ami a standard assert kifejezés előtt kinaplózza a hibaüzenetet.
+
+    \fn{void cassert(Logger *log\_inst, int exp, char *msg, ...)}
+    Egy rövid függvény ami a standard assert függvény meghívása előtt kinaplózza a hibaüzenetet.
 
     \subsection{utils/geometry}
     A pont és méret struktúrákat és segédfüggvényeit tartalmazzák, az SvgFactory és SvgFile használják.
@@ -153,9 +335,53 @@ urlcolor=cyan,
 
     \subsection{utils/symbols\_helper}
     A támogatott szimbólumok definícióját és helyettesítési értékeit tartalmazza, egy segédfüggvénnyel ami megnézni, hogy az adott parancs milyen támogatott szimbólumot tartalmaz.
+    Bizonyos szimbólumoknak vannak nagybetűs verziói ezekhez speciális mezők vannak a szimbólum definíciókban.
+    \begin{center}
+        \begin{tabular}{ | p{5.5cm} || p{5.5cm} | }
+            \hline
+            \textbf{Tipus / Név} & Leírás \\
+            \hline
+            \textbf{char *command} & Parancs a szimbólumhoz\\
+            \hline
+            \textbf{char *substitution} & Helyettesítési érték\\
+            \hline
+            \textbf{char *uppercase\_substitution} & Nagybetűs helyettesítési érték\\
+            \hline
+            \textbf{Size box} & Mérete a szimbólumnak\\
+            \hline
+            \textbf{Size box\_uppercase} & Nagybetűs méret\\
+            \hline
+        \end{tabular}\\
+        \textit{struct SymbolDefinition}
+    \end{center}
 
-    \subsection{utils/test\_script}
-    A program által jelenleg felhasznált bemenetet tartalmazza.
+    \fn{SymbolDefinitionFindResults SymbolDefinition\_get\_supported\_results(DString *command)}
+    Megpróbálja megkeresni a parancsot a támagotatt szimbólumok tömbjéből, ellenőrizve azt is, hogy egy nagybetűs verzió-e.
+
+    \begin{center}
+        \begin{tabular}{ | p{5.5cm} || p{5.5cm} | }
+            \hline
+            \textbf{Tipus / Név} & Leírás \\
+            \hline
+            \textbf{bool found} & Megtaláta-e a keresés a támogatott szimbólumot\\
+            \hline
+            \textbf{const SymbolDefinition *definition} & NULL ha nem található, a szimbólum egyébbként a definícióra pointer\\
+            \hline
+            \textbf{bool is\_uppercase} & Keresett szimbólum egy nagybetűs verzió-e\\
+            \hline
+        \end{tabular}\\
+        \textit{struct SymbolDefinitionFindResults}
+    \end{center}
+
+    \section{Test Suite}
+    A programnak egy nem hivatalos része a test futtató program, csak azért létezik, hogy a fordító egy adott verzióján gyorsabb legyen kipróbálni sok példa scriptet.
+    A futtatásához szükséges \textit{npm} és \textit{node}.
+    Javascriptben íródott ezért nem is része a beadandómnak de az értékelőknek ajánlom mert sokat segíthet.
+
+    \subsection{Használat}
+    \textit{npm i} -- Telepíteni kell a függőségeket\\
+    \textit{npm run test} -- Testek futtatása, a \textit{/test/test.html} a generált html file az eredményekkel\\
+    \textit{npm run rast} -- Testek futtatása kimeneti SVG-k raszterizációjával az artifacts mappába
 
     \section{Összefoglaló}
     A program véleményem szerint a program több mint fele készenvan, sok nehéz részleten túlvagyok.

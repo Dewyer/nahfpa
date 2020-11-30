@@ -111,7 +111,6 @@ ExpNode *ExpParser_parse_node_list(ExpParser *self, TokenSlice *slice);
 TokenSlice *
 ExpParser_parse_command_args(ExpParser *self, ExpNode *command, int required_args, int max_args, size_t args_start,
 							 size_t max_i) {
-	// FIXME Refactor to use an iterable
 	TokenSlice *arg1_slice = ExpParser_get_command_argument_slice(self, command->value, required_args >= 1, args_start,
 																  max_i);
 	TokenSlice *arg2_slice = NULL;

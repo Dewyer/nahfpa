@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <utils/cassert.h>
 #include <utils/help_txt.h>
-#include <utils/test_script.h>
 #include <svg_factory/SvgFactory.h>
 #include "NahfpaCli.h"
 #include "data_structures/DString.h"

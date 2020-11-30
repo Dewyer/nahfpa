@@ -213,7 +213,7 @@ void SvgFactory_render_brackets(SvgFactory *self, BoxNode *box_node)
 
 void SvgFactory_render_node(SvgFactory *self, BoxNode *box_node) {
 	if (DEBUG_BOXES)
-		SvgFile_add_box(self->svg_file, &box_node->global_pos, &box_node->box); // Debug
+		SvgFile_add_box(self->svg_file, &box_node->global_pos, &box_node->box);
 
 	SvgFactory_render_children(self, box_node);
 
